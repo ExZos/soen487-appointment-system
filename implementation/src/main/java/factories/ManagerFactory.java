@@ -12,7 +12,7 @@ public enum ManagerFactory {
 
     ManagerFactory(String configKey) {
         try {
-            Class<?> cl = Class.forName(ConfigReader.getConfigFileKey(ConfigReader.CONFIG_FILE, configKey));
+            Class<?> cl = Class.forName(ConfigReader.CONFIG_FILE.getConfigFileKey(configKey));
             Constructor<?> cons = cl.getConstructor();
             manager = (IManager) cons.newInstance();
         }
