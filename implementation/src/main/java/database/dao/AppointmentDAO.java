@@ -8,12 +8,39 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class AppointmentDAO {
-    /**
-     * DID NOT DO get Appointments using resource name yet!!
-    public static ArrayList<Appointment> getResourceAppointments(String name) throws SQLException {
 
+     //DID NOT DO get Appointments using resource name yet!!
+    public static ArrayList<Appointment> getResourceAppointments(String name) throws SQLException {
+        ArrayList<Appointment> appointments = new ArrayList<>();
+
+        Connection conn = DBConnection.getConnection();
+        int resourceId = getResourceId(conn, name);
+
+        if(resourceId == 0)
+            return null;
+
+        String sql = "SELECT * FROM Appointment WHERE resourceId = ?";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setInt(1, resourceId);
+        ResultSet rs = stmt.executeQuery();
+
+        while(rs.next())
+            appointments.add(mapResultSetToAppointment(rs));
+
+        return appointments;
     }
-     */
+    public static int getResourceId(Connection conn, String name) throws SQLException {
+        String sql = "SELECT * FROM Resource WHERE name = ?";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setString(1, name);
+        ResultSet rs = stmt.executeQuery();
+
+        if (!rs.next())
+            return 0;
+
+        return rs.getInt("id");
+    }
+
 
     /**
      * THIS IS TO CREATE AN OPEN SLOT WITH A RESOURCE SO A CUSTOMER CAN BOOK AN APPOINTMENT WITH!!
@@ -22,6 +49,7 @@ public class AppointmentDAO {
      */
     public static Integer createAppointment(int resourceId, LocalDate date) throws SQLException {
         String status = "OPEN";
+        //int userId = Integer.parseInt(null);
 
         Connection conn = DBConnection.getConnection();
         String sql = "INSERT INTO Appointment(resourceId, appointmentDate, status) VALUES(?,?,?)";
@@ -114,14 +142,13 @@ public class AppointmentDAO {
 
     public static Integer cancelAppointment(int appointmentId) throws SQLException {
         String status = "OPEN";
-        int userId = 0;
         String message = "";
 
         Connection conn = DBConnection.getConnection();
         String sql = "UPDATE Appointment SET userId = ?, message = ?, status = ? WHERE id = ?";
         PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-        stmt.setInt(1, userId);
-        stmt.setString(2, message);
+        stmt.setNull(1, java.sql.Types.INTEGER);
+        stmt.setNull(2, Types.VARCHAR);
         stmt.setString(3, status);
         stmt.setInt(4, appointmentId);
 

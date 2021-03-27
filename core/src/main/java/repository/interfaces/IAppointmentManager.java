@@ -12,4 +12,5 @@ public interface IAppointmentManager {
     Appointment createAppointment(int resourceId, Date date) throws SQLException;
     Appointment bookAppointment(int appointmentId, int userId, String message) throws SQLException;
     Appointment cancelAppointment(int appointmentId) throws SQLException;
+    Appointment getResourceAppointments(String name) throws SQLException;
 }

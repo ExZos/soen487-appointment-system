@@ -36,6 +36,10 @@ public class AppointmentManager {
         return AppointmentDAO.getAppointment(appointmentId);
     }
 
+    public ArrayList<Appointment> getResourceAppointments(String name) throws SQLException {
+        return AppointmentDAO.getResourceAppointments(name);
+    }
+
 //    public static void main(String[] args) {
 //        try {
 //            //Assume we already created 3 customers and 2 resource(dentist1 and dentist2)
@@ -84,6 +88,9 @@ public class AppointmentManager {
 //            //Cancel Appointment3 booking
 //            System.out.println("Cancel Appointment3:");
 //            System.out.println(appointmentManager.cancelAppointment(3));
+//
+//            System.out.println("View dentist1 appointments:");
+//            System.out.println(appointmentManager.getResourceAppointments("Dentist1"));
 //
 //        } catch(Exception e) {
 //            e.printStackTrace();
