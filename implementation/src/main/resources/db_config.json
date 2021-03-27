@@ -1,7 +1,7 @@
 {
   "jdbcDriver": "com.mysql.cj.jdbc.Driver",
   "dbHost": "jdbc:mysql://localhost:3306/",
-  "dbName": "CHANGEME",
+  "dbName": "a3",
   "dbUser": "test",
   "dbPassword": "QwErT1@3"
 }
