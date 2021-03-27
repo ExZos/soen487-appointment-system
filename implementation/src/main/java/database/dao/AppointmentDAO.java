@@ -124,22 +124,4 @@ public class AppointmentDAO {
 
         return appointment;
     }
-
-    public static Integer cancelAppointment(int appointmentId, String status) throws SQLException {
-
-        Connection conn = DBConnection.getConnection();
-        String sql = "UPDATE Appointment SET userId = ?, message = ?, status = ? WHERE id = ?";
-        PreparedStatement stmt = conn.prepareStatement(sql);
-        stmt.setNull(1, java.sql.Types.INTEGER);
-        stmt.setNull(2, Types.VARCHAR);
-        stmt.setString(3, status);
-        stmt.setInt(4, appointmentId);
-
-        int row = stmt.executeUpdate();
-
-        if(row <= 0)
-            return null;
-
-        return appointmentId;
-    }
 }
