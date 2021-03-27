@@ -6,7 +6,7 @@ import utilities.ConfigReader;
 import java.lang.reflect.Constructor;
 
 public enum ManagerFactory {
-    TEMP("TempManagerImpl");
+    UserManager("UserManagerImpl");
 
     private IManager manager;
 

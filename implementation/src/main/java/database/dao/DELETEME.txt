@@ -1,8 +1,0 @@
-What' This?
-This file is used to push empty directories 
-Because git doesn't track new empty directories as changes
-
-
-
-!!!IMPORTANT!!!
-If there's already another file in this directory then DELETE ME
