@@ -9,19 +9,14 @@ import java.util.ArrayList;
 
 public class AppointmentDAO {
 
-     //DID NOT DO get Appointments using resource name yet!!
-    public static ArrayList<Appointment> getResourceAppointments(String name) throws SQLException {
+    public static ArrayList<Appointment> getResourceAppointments(int id) throws SQLException {
         ArrayList<Appointment> appointments = new ArrayList<>();
 
         Connection conn = DBConnection.getConnection();
-        int resourceId = getResourceId(conn, name);
-
-        if(resourceId == 0)
-            return null;
 
         String sql = "SELECT * FROM Appointment WHERE resourceId = ?";
         PreparedStatement stmt = conn.prepareStatement(sql);
-        stmt.setInt(1, resourceId);
+        stmt.setInt(1, id);
         ResultSet rs = stmt.executeQuery();
 
         while(rs.next())
@@ -29,27 +24,13 @@ public class AppointmentDAO {
 
         return appointments;
     }
-    public static int getResourceId(Connection conn, String name) throws SQLException {
-        String sql = "SELECT * FROM Resource WHERE name = ?";
-        PreparedStatement stmt = conn.prepareStatement(sql);
-        stmt.setString(1, name);
-        ResultSet rs = stmt.executeQuery();
-
-        if (!rs.next())
-            return 0;
-
-        return rs.getInt("id");
-    }
-
 
     /**
      * THIS IS TO CREATE AN OPEN SLOT WITH A RESOURCE SO A CUSTOMER CAN BOOK AN APPOINTMENT WITH!!
      *
      *
      */
-    public static Integer createAppointment(int resourceId, LocalDate date) throws SQLException {
-        String status = "OPEN";
-        //int userId = Integer.parseInt(null);
+    public static Integer createAppointment(int resourceId, LocalDate date, String status) throws SQLException {
 
         Connection conn = DBConnection.getConnection();
         String sql = "INSERT INTO Appointment(resourceId, appointmentDate, status) VALUES(?,?,?)";
@@ -71,24 +52,22 @@ public class AppointmentDAO {
      *
      *
      */
-    public static Integer bookAppointment(int appointmentId, int userId, String message) throws SQLException {
-        String status = "CLOSED";
+    public static Integer updateAppointment(int appointmentId, int userId, String message, String status) throws SQLException {
 
         Connection conn = DBConnection.getConnection();
         String sql = "UPDATE Appointment SET userId = ?, message = ?, status = ? WHERE id = ?";
-        PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        PreparedStatement stmt = conn.prepareStatement(sql);
         stmt.setInt(1, userId);
         stmt.setString(2, message);
         stmt.setString(3, status);
         stmt.setInt(4, appointmentId);
 
-        stmt.executeUpdate();
-        ResultSet rs = stmt.getGeneratedKeys();
+        int row = stmt.executeUpdate();
 
-        if(!rs.next())
+        if(row <= 0)
             return null;
 
-        return rs.getInt(1);
+        return appointmentId;
     }
     //RETURN SPECIFIC APPOINTMENT DETAIL
     public static Appointment getAppointment(int appointmentId) throws SQLException {
@@ -140,24 +119,21 @@ public class AppointmentDAO {
         return appointment;
     }
 
-    public static Integer cancelAppointment(int appointmentId) throws SQLException {
-        String status = "OPEN";
-        String message = "";
+    public static Integer cancelAppointment(int appointmentId, String status) throws SQLException {
 
         Connection conn = DBConnection.getConnection();
         String sql = "UPDATE Appointment SET userId = ?, message = ?, status = ? WHERE id = ?";
-        PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        PreparedStatement stmt = conn.prepareStatement(sql);
         stmt.setNull(1, java.sql.Types.INTEGER);
         stmt.setNull(2, Types.VARCHAR);
         stmt.setString(3, status);
         stmt.setInt(4, appointmentId);
 
-        stmt.executeUpdate();
-        ResultSet rs = stmt.getGeneratedKeys();
+        int row = stmt.executeUpdate();
 
-        if(!rs.next())
+        if(row <= 0)
             return null;
 
-        return rs.getInt(1);
+        return appointmentId;
     }
 }

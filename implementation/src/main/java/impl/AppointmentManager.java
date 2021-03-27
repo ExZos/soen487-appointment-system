@@ -2,6 +2,8 @@ package impl;
 
 import database.dao.AppointmentDAO;
 import database.dao.UserDAO;
+import repository.interfaces.IAppointmentManager;
+import repository.interfaces.IUserManager;
 import repository.pojos.Appointment;
 
 import java.sql.SQLException;
@@ -9,7 +11,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class AppointmentManager {
+public class AppointmentManager implements IAppointmentManager {
     public ArrayList<Appointment> getUserAppointments(int userId) throws SQLException {
         return AppointmentDAO.getUserAppointments(userId);
     }
@@ -19,7 +21,7 @@ public class AppointmentManager {
     }
 
     public Appointment createAppointment(int resourceId, LocalDate date) throws SQLException {
-        Integer id = AppointmentDAO.createAppointment(resourceId, date);
+        Integer id = AppointmentDAO.createAppointment(resourceId, date, Appointment.Status.OPEN.toString());
 
         if(id == null)
             return null;
@@ -28,16 +30,24 @@ public class AppointmentManager {
     }
 
     public Appointment bookAppointment(int appointmentId, int userId, String message) throws SQLException {
-        Integer id =  AppointmentDAO.bookAppointment(appointmentId, userId, message);
-        return AppointmentDAO.getAppointment(appointmentId);
+        Integer id =  AppointmentDAO.updateAppointment(appointmentId, userId, message, Appointment.Status.CLOSED.toString());
+        return AppointmentDAO.getAppointment(id);
     }
     public Appointment cancelAppointment(int appointmentId) throws SQLException {
-        Integer id =  AppointmentDAO.cancelAppointment(appointmentId);
-        return AppointmentDAO.getAppointment(appointmentId);
+        Integer id =  AppointmentDAO.cancelAppointment(appointmentId, Appointment.Status.OPEN.toString());
+        return AppointmentDAO.getAppointment(id);
     }
 
+    /**
+     * NOT NEEDED FOR NOW!!
+     *
     public ArrayList<Appointment> getResourceAppointments(String name) throws SQLException {
         return AppointmentDAO.getResourceAppointments(name);
+    }
+     */
+
+    public ArrayList<Appointment> getResourceAppointments(int id) throws SQLException {
+        return AppointmentDAO.getResourceAppointments(id);
     }
 
 //    public static void main(String[] args) {
@@ -89,7 +99,7 @@ public class AppointmentManager {
 //            System.out.println(appointmentManager.cancelAppointment(3));
 //
 //            System.out.println("View dentist1 appointments:");
-//            System.out.println(appointmentManager.getResourceAppointments("Dentist1"));
+//            System.out.println(appointmentManager.getResourceAppointments(1));
 //
 //        } catch(Exception e) {
 //            e.printStackTrace();
