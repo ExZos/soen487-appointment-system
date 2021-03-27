@@ -7,10 +7,8 @@ import repository.interfaces.ISSOManager;
 import repository.interfaces.IUserManager;
 import repository.pojos.User;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("user")
@@ -26,6 +24,7 @@ public class UserRest {
                     .header(HttpHeaders.LOCATION, ssoManager.getAuthorizationUrl())
                     .build();
         } catch(Exception e) {
+            e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .build();
         }
@@ -33,19 +32,19 @@ public class UserRest {
 
     @GET
     @Path("token")
-    public Response setAccessToken(@QueryParam("code") String code) {
+    public Response getToken(@QueryParam("code") String code) {
         try {
             OAuth2AccessToken accessToken = ssoManager.getAccessToken(code);
             String email = ssoManager.getLoginEmail(accessToken);
             User user = userManager.getUserByEmail(email);
 
             if(user == null)
-                userManager.createUser(email, accessToken.getAccessToken().toString());
+                userManager.createUser(email, accessToken.getAccessToken());
             else
-                userManager.updateUserToken(user.getUserId(), accessToken.getAccessToken().toString());
+                userManager.updateUserToken(email, accessToken.getAccessToken());;
 
             return Response.status(Response.Status.OK)
-                    .entity("You are now logged in")
+                    .entity(accessToken.getAccessToken())
                     .build();
         } catch(Exception e) {
             e.printStackTrace();
@@ -54,17 +53,37 @@ public class UserRest {
         }
     }
 
-    @GET
-    @Path("test/{userId}")
-    public Response test(@PathParam("userId") int userId) {
+    // Not sure if needed or if UserManager.authenticate is enough
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Path("auth")
+    public Response authenticate(@FormParam("email") String email, @HeaderParam("x-api-key") String token) {
         try {
-            User user = userManager.getUserById(userId);
-            OAuth2AccessToken accessToken = new OAuth2AccessToken(user.getToken());
-
             return Response.status(Response.Status.OK)
-                    .entity("TEST")
+                    .entity(userManager.authenticateUser(email, token))
                     .build();
         } catch(Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(false)
+                    .build();
+        }
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Path("logout")
+    public Response logout(@FormParam("email") String email, @HeaderParam("x-api-key") String token) {
+        try {
+            boolean success = userManager.removeUserToken(email);
+            if(!success)
+                throw new Exception("Failed to logout");
+
+            return Response.status(Response.Status.OK)
+                    .entity("You have been logged out")
+                    .build();
+        } catch(Exception e) {
+            e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .build();
         }

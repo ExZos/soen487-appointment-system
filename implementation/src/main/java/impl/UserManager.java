@@ -21,15 +21,22 @@ public class UserManager implements IUserManager {
         if(id == null)
             return null;
 
-        return UserDAO.selectUserById(id);
+        return getUserById(id);
     }
 
-    public User updateUserToken(int userId, String token) throws SQLException {
-        Integer id = UserDAO.updateUserToken(userId, token);
+    public String updateUserToken(String email, String token) throws SQLException {
+        return UserDAO.updateUserToken(email, token);
+    }
 
-        if(id == null)
-            return null;
+    public boolean authenticateUser(String email, String token) throws SQLException {
+        User user = getUserByEmail(email);
 
-        return UserDAO.selectUserById(id);
+        return user != null && token.equals(user.getToken());
+    }
+
+    public boolean removeUserToken(String email) throws SQLException {
+        String test = UserDAO.updateUserToken(email, null);
+        System.out.println(test);
+        return  test == null;
     }
 }
