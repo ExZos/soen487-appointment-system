@@ -9,8 +9,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 public enum ConfigReader {
-    DB_CONFIG_FILE("db_config.json"),
-    CONFIG_FILE("config.json");
+    CONFIG_FILE("config.json"),
+    DB_CONFIG_FILE("db_config.json");
 
     private String configFile;
 
