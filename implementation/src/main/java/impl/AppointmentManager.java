@@ -34,7 +34,10 @@ public class AppointmentManager implements IAppointmentManager {
         return AppointmentDAO.getAppointment(id);
     }
     public Appointment cancelAppointment(int appointmentId) throws SQLException {
-        Integer id =  AppointmentDAO.cancelAppointment(appointmentId, Appointment.Status.OPEN.toString());
+        int userId = -1;
+        String message = null;
+        Integer id =  AppointmentDAO.updateAppointment(appointmentId, userId, message, Appointment.Status.OPEN.toString());
+        //Integer id =  AppointmentDAO.cancelAppointment(appointmentId, Appointment.Status.OPEN.toString());
         return AppointmentDAO.getAppointment(id);
     }
 
@@ -50,11 +53,11 @@ public class AppointmentManager implements IAppointmentManager {
         return AppointmentDAO.getResourceAppointments(id);
     }
 
-//    public static void main(String[] args) {
-//        try {
-//            //Assume we already created 3 customers and 2 resource(dentist1 and dentist2)
-//            AppointmentManager appointmentManager = new AppointmentManager();
-//
+    public static void main(String[] args) {
+        try {
+            //Assume we already created 3 customers and 2 resource(dentist1 and dentist2)
+            AppointmentManager appointmentManager = new AppointmentManager();
+
 //            //CREATE APPOINTMENT for dentist1
 //            LocalDate date1 = LocalDate.of(2020,03,27);
 //            LocalDate date2 = LocalDate.of(2020,03,28);
@@ -92,17 +95,17 @@ public class AppointmentManager implements IAppointmentManager {
 //            //Appointment 3 details
 //            System.out.println("Appointment 3 details:");
 //            System.out.println(appointmentManager.getAppointment(3));
-//
-//            System.out.println("\n");
-//            //Cancel Appointment3 booking
-//            System.out.println("Cancel Appointment3:");
-//            System.out.println(appointmentManager.cancelAppointment(3));
-//
-//            System.out.println("View dentist1 appointments:");
-//            System.out.println(appointmentManager.getResourceAppointments(1));
-//
-//        } catch(Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
+
+            System.out.println("\n");
+            //Cancel Appointment3 booking
+            System.out.println("Cancel Appointment3:");
+            System.out.println(appointmentManager.cancelAppointment(3));
+
+            System.out.println("View dentist1 appointments:");
+            System.out.println(appointmentManager.getResourceAppointments(1));
+
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

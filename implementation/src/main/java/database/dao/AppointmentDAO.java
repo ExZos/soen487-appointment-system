@@ -57,7 +57,13 @@ public class AppointmentDAO {
         Connection conn = DBConnection.getConnection();
         String sql = "UPDATE Appointment SET userId = ?, message = ?, status = ? WHERE id = ?";
         PreparedStatement stmt = conn.prepareStatement(sql);
-        stmt.setInt(1, userId);
+        if(userId > 0){
+            stmt.setInt(1, userId);
+        }
+        else{
+            stmt.setNull(1, java.sql.Types.INTEGER);
+        }
+
         stmt.setString(2, message);
         stmt.setString(3, status);
         stmt.setInt(4, appointmentId);
