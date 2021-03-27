@@ -6,7 +6,8 @@ import utilities.ConfigReader;
 import java.lang.reflect.Constructor;
 
 public enum ManagerFactory {
-    TEMP("TempManagerImpl");
+    GoogleSSOManager("GoogleSSOManagerImpl"),
+    UserManager("UserManagerImpl");
 
     private IManager manager;
 

@@ -1,3 +1,4 @@
 {
-  "TempManagerImpl": "impl.TempManager"
+  "GoogleSSOManagerImpl": "impl.GoogleSSOManager",
+  "UserManagerImpl": "impl.UserManager"
 }
