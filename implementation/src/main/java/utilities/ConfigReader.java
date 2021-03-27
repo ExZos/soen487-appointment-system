@@ -11,7 +11,7 @@ import java.io.InputStreamReader;
 public enum ConfigReader {
     CONFIG_FILE("config.json"),
     DB_CONFIG_FILE("db_config.json"),
-    GOOGLE_CREDS_FILE("googleCredentials.json"),;
+    GOOGLE_CREDS_FILE("googleCredentials.json");
 
     private String configFile;
 
