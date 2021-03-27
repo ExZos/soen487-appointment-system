@@ -83,7 +83,6 @@ public class AppointmentManager {
 //            System.out.println("Appointment 3 details:");
 //            System.out.println(appointmentManager.getAppointment(3));
 //
-//            //THIS PART IS NOT WORKING YET (FOREIGN KEY ISSUES)
 //            System.out.println("\n");
 //            //Cancel Appointment3 booking
 //            System.out.println("Cancel Appointment3:");
