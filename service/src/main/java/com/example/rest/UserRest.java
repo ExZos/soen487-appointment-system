@@ -92,7 +92,8 @@ public class UserRest {
     }
 
 
-    // EVERYTHING BELOW HERE WAS JUST USED TO MAKE IT EASIER TO TEST THE CalendarAPIManager METHODS
+    // EVERYTHING BELOW HERE WAS JUST USED TO MAKE IT EASIER TO TEST THE CalendarAPIManager METHODS WITH DIFF VALUES
+    // *** Will delete everything below later ***
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("get")
