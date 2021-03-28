@@ -3,6 +3,7 @@ package com.example.rest;
 import com.github.scribejava.core.model.OAuth2AccessToken;
 import factories.ManagerFactory;
 import org.apache.http.HttpHeaders;
+import repository.interfaces.ICalendarManager;
 import repository.interfaces.ISSOManager;
 import repository.interfaces.IUserManager;
 import repository.pojos.User;
@@ -10,6 +11,7 @@ import repository.pojos.User;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.time.LocalDate;
 
 @Path("user")
 public class UserRest {
@@ -41,7 +43,7 @@ public class UserRest {
             if(user == null)
                 userManager.createUser(email, accessToken.getAccessToken());
             else
-                userManager.updateUserToken(email, accessToken.getAccessToken());;
+                userManager.updateUserToken(email, accessToken.getAccessToken());
 
             return Response.status(Response.Status.OK)
                     .entity(accessToken.getAccessToken())
@@ -81,6 +83,24 @@ public class UserRest {
 
             return Response.status(Response.Status.OK)
                     .entity("You have been logged out")
+                    .build();
+        } catch(Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .build();
+        }
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Path("test")
+    public Response test(@HeaderParam("x-api-key") String token, @FormParam("email") String email, @FormParam("year") int year,
+                         @FormParam("month") int month, @FormParam("dayOfMonth") int dayOfMonth) {
+        try {
+            ICalendarManager calendarManager = (ICalendarManager) ManagerFactory.CalendarManager.getManager();
+            System.out.println(calendarManager.getEventIdOnDate(new OAuth2AccessToken(token), LocalDate.of(year, month, dayOfMonth)));
+
+            return Response.status(Response.Status.OK)
                     .build();
         } catch(Exception e) {
             e.printStackTrace();
