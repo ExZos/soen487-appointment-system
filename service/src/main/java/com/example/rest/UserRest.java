@@ -93,12 +93,86 @@ public class UserRest {
 
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Path("test")
-    public Response test(@HeaderParam("x-api-key") String token, @FormParam("email") String email, @FormParam("year") int year,
-                         @FormParam("month") int month, @FormParam("dayOfMonth") int dayOfMonth) {
+    @Path("get")
+    public Response testGet(@FormParam("email") String email, @FormParam("year") int year, @FormParam("month") int month,
+                            @FormParam("dayOfMonth") int dayOfMonth) {
         try {
             ICalendarManager calendarManager = (ICalendarManager) ManagerFactory.CalendarManager.getManager();
-            System.out.println(calendarManager.getEventIdOnDate(new OAuth2AccessToken(token), LocalDate.of(year, month, dayOfMonth)));
+            User user = userManager.getUserByEmail(email);
+
+            String eventId = calendarManager.getEventIdOnDate(new OAuth2AccessToken(user.getToken()), LocalDate.of(year, month, dayOfMonth));
+            if(eventId == null)
+                throw new Exception("No event on that day");
+
+            return Response.status(Response.Status.OK)
+                    .entity(eventId)
+                    .build();
+        } catch(Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .build();
+        }
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Path("create")
+    public Response testCreate(@FormParam("email") String email, @FormParam("resourceName") String resourceName, @FormParam("year") int year,
+                               @FormParam("month") int month, @FormParam("dayOfMonth") int dayOfMonth) {
+        try {
+            ICalendarManager calendarManager = (ICalendarManager) ManagerFactory.CalendarManager.getManager();
+            User user = userManager.getUserByEmail(email);
+
+            boolean success = calendarManager.createEventOnDate(new OAuth2AccessToken(user.getToken()), resourceName, LocalDate.of(year, month, dayOfMonth));
+            if(!success)
+                throw new Exception("Failed to create event");
+
+            return Response.status(Response.Status.OK)
+                    .build();
+        } catch(Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .build();
+        }
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Path("delete")
+    public Response testDelete(@FormParam("email") String email, @FormParam("year") int year, @FormParam("month") int month,
+                               @FormParam("dayOfMonth") int dayOfMonth) {
+        try {
+            ICalendarManager calendarManager = (ICalendarManager) ManagerFactory.CalendarManager.getManager();
+            User user = userManager.getUserByEmail(email);
+
+            boolean success = calendarManager.deleteEventOnDate(new OAuth2AccessToken(user.getToken()), LocalDate.of(year, month, dayOfMonth));
+            if(!success)
+                throw new Exception("Failed to delete event");
+
+            return Response.status(Response.Status.OK)
+                    .build();
+        } catch(Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .build();
+        }
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Path("update")
+    public Response testUpdate(@FormParam("email") String email, @FormParam("fromYear") int fromYear, @FormParam("fromMonth") int fromMonth,
+                             @FormParam("fromDayInMonth") int fromDayInMonth, @FormParam("toYear") int toYear, @FormParam("toMonth") int toMonth,
+                             @FormParam("toDayInMonth") int toDayInMonth) {
+        try {
+            ICalendarManager calendarManager = (ICalendarManager) ManagerFactory.CalendarManager.getManager();
+            User user = userManager.getUserByEmail(email);
+
+            LocalDate from = LocalDate.of(fromYear, fromMonth, fromDayInMonth);
+            LocalDate to = LocalDate.of(toYear, toMonth, toDayInMonth);
+            boolean success = calendarManager.updateEventOnDate(new OAuth2AccessToken(user.getToken()), from, to);
+            if(!success)
+                throw new Exception("Failed to move event");
 
             return Response.status(Response.Status.OK)
                     .build();
