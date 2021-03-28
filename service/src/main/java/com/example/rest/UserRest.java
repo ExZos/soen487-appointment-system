@@ -91,6 +91,8 @@ public class UserRest {
         }
     }
 
+
+    // EVERYTHING BELOW HERE WAS JUST USED TO MAKE IT EASIER TO TEST THE CalendarAPIManager METHODS
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("get")

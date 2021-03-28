@@ -51,7 +51,6 @@ public class CalendarAPIManager implements ICalendarManager {
         if(events.size() == 0)
             return null;
 
-        System.out.println(events.get(0).getStart().toPrettyString());
         return events.get(0);
     }
 
