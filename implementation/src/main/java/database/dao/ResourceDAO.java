@@ -14,7 +14,7 @@ public class ResourceDAO {
 
         Connection conn = DBConnection.getConnection();
 
-        String sql = "SELECT * FROM Resource WHERE resourceId = ?";
+        String sql = "SELECT * FROM Resource;";
         Statement stmt = conn.createStatement();
 
         ResultSet rs = stmt.executeQuery(sql);
@@ -23,6 +23,35 @@ public class ResourceDAO {
 
         return resources;
     }
+
+    public static Resource getResourceById(int id) throws SQLException {
+
+        Connection conn = DBConnection.getConnection();
+        String sql = "SELECT * FROM Resource WHERE id = ?";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setInt(1, id);
+        ResultSet rs = stmt.executeQuery();
+
+        if (!rs.next())
+            return null;
+
+        return mapResultSetToResource(rs);
+    }
+
+    public static Resource getResourceByName(String name) throws SQLException {
+
+        Connection conn = DBConnection.getConnection();
+        String sql = "SELECT * FROM Resource WHERE name = ?";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setString(1, name);
+        ResultSet rs = stmt.executeQuery();
+
+        if (!rs.next())
+            return null;
+
+        return mapResultSetToResource(rs);
+    }
+
     private static Resource mapResultSetToResource(ResultSet rs) throws SQLException {
         Resource resource = new Resource();
         resource.setResourceId(rs.getInt("id"));
