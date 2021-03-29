@@ -1,3 +1,5 @@
 {
-  "UserManagerImpl": "impl.UserManager"
+  "GoogleSSOManagerImpl": "impl.GoogleSSOManager",
+  "UserManagerImpl": "impl.UserManager",
+  "CalendarManagerImpl": "impl.CalendarAPIManager"
 }

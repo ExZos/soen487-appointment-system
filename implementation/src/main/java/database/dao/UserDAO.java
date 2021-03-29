@@ -50,19 +50,19 @@ public class UserDAO {
         return rs.getInt(1);
     }
 
-    public static Integer updateUserToken(int userId, String token) throws SQLException {
+    public static String updateUserToken(String  email, String token) throws SQLException {
         Connection conn = DBConnection.getConnection();
-        String sql = "UPDATE User SET token = ? WHERE id = ?";
+        String sql = "UPDATE User SET token = ? WHERE email = ?";
 
         PreparedStatement stmt = conn.prepareStatement(sql);
         stmt.setString(1, token);
-        stmt.setInt(2, userId);
+        stmt.setString(2, email);
         int row = stmt.executeUpdate();
 
         if(row <= 0)
             return null;
 
-        return userId;
+        return token;
     }
 
     private static User mapResultSetToUser(ResultSet rs) throws SQLException {
