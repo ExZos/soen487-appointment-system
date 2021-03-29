@@ -28,15 +28,13 @@ public class UserManager implements IUserManager {
         return UserDAO.updateUserToken(email, token);
     }
 
-    public boolean authenticateUser(String email, String token) throws SQLException {
+    public boolean validateToken(String email, String token) throws SQLException {
         User user = getUserByEmail(email);
 
         return user != null && token.equals(user.getToken());
     }
 
-    public boolean removeUserToken(String email) throws SQLException {
-        String test = UserDAO.updateUserToken(email, null);
-        System.out.println(test);
-        return  test == null;
+    public boolean logout(String email) throws SQLException {
+        return  UserDAO.updateUserToken(email, null) == null;
     }
 }
