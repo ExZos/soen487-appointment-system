@@ -62,7 +62,7 @@ public class UserRest {
     public Response authenticate(@FormParam("email") String email, @HeaderParam("x-api-key") String token) {
         try {
             return Response.status(Response.Status.OK)
-                    .entity(userManager.authenticateUser(email, token))
+                    .entity(userManager.validateToken(email, token))
                     .build();
         } catch(Exception e) {
             e.printStackTrace();
@@ -77,7 +77,12 @@ public class UserRest {
     @Path("logout")
     public Response logout(@FormParam("email") String email, @HeaderParam("x-api-key") String token) {
         try {
-            boolean success = userManager.removeUserToken(email);
+            boolean validated = userManager.validateToken(email, token);
+            if(!validated)
+                return Response.status(Response.Status.FORBIDDEN)
+                        .build();
+
+            boolean success = userManager.logout(email);
             if(!success)
                 throw new Exception("Failed to logout");
 

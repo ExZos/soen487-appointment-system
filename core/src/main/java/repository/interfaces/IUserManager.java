@@ -9,6 +9,6 @@ public interface IUserManager extends IManager {
     User getUserByEmail(String email) throws SQLException;
     User createUser(String email, String token) throws SQLException;
     String updateUserToken(String email, String token) throws SQLException;
-    boolean authenticateUser(String email, String token) throws SQLException;
-    boolean removeUserToken(String email) throws SQLException;
+    boolean validateToken(String email, String token) throws SQLException;
+    boolean logout(String email) throws SQLException;
 }
