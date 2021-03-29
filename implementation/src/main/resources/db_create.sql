@@ -1,7 +1,7 @@
 CREATE TABLE User(
     id INT NOT NULL AUTO_INCREMENT,
     email VARCHAR(255) NOT NULL,
-    token VARCHAR(255) NOT NULL,
+    token VARCHAR(255),
     CONSTRAINT PK_id PRIMARY KEY(id)
 );
 
