@@ -6,7 +6,8 @@ import { createBrowserHistory } from 'history';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import './styles/index.css';
-import App from './components/App';
+import Login from './components/Login';
+import Home from './components/Home';
 
 const history = createBrowserHistory();
 
@@ -14,7 +15,8 @@ const routing = (
     <React.StrictMode>
         <Router history={history}>
             <Switch>
-                <Route path="/" component={App} />
+                <Route path="/home" component={Home} />
+                <Route path="/" component={Login} />
             </Switch>
         </Router>
     </React.StrictMode>
