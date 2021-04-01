@@ -45,13 +45,13 @@ public class ResourceRest {
         }
     }
 
-    //@GET
-    //@Produces(MediaType.APPLICATION_JSON)
-    @POST
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response getResources(@FormParam("email") String email, @HeaderParam("x-api-key") String token) {
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    //@POST
+   // @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response getResources(@HeaderParam("email") String email, @HeaderParam("username") String username, @HeaderParam("x-api-key") String token) {
         try {
-            if(userManager.validateToken(email, token)){
+            if(userManager.validateToken(email, token) || adminManager.validateToken(username, token)){
                 List<Resource> resources = resourceManager.getResourceList();
                 GenericEntity<List<Resource>> entity = new GenericEntity<List<Resource>>(resources) {};
                 return Response.status(Response.Status.OK)
