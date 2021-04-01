@@ -1,8 +1,17 @@
 package repository.pojos;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement(name="resource")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Resource {
-    private int resourceId;
-    private String name;
+    @XmlElement
+    protected int resourceId;
+    @XmlElement
+    protected String name;
 
     public Resource() { }
 
