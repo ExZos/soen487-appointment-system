@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 
-public interface IAppointmentManager {
+public interface IAppointmentManager extends IManager{
     ArrayList<Appointment> getUserAppointments(int userId) throws SQLException;
     Appointment getAppointment(int appointmentId) throws SQLException;
     Appointment createAppointment(int resourceId, LocalDate date) throws SQLException;
