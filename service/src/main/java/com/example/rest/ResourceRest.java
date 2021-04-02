@@ -20,8 +20,9 @@ public class ResourceRest {
 
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_JSON)
     @Path("create")
-    public Response create(@HeaderParam("x-api-key") String token, @FormParam("username") String username, @FormParam("name") String name) {
+    public Response create(@HeaderParam("x-api-key") String token, @HeaderParam("username") String username, @FormParam("name") String name) {
         try {
             if(name == null)
                 return Response.status(Response.Status.FORBIDDEN)
@@ -47,8 +48,6 @@ public class ResourceRest {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    //@POST
-   // @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response getResources(@HeaderParam("email") String email, @HeaderParam("username") String username, @HeaderParam("x-api-key") String token) {
         try {
             if(userManager.validateToken(email, token) || adminManager.validateToken(username, token)){
