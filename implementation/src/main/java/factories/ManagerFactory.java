@@ -8,6 +8,7 @@ import java.lang.reflect.Constructor;
 public enum ManagerFactory {
     GoogleSSOManager("GoogleSSOManagerImpl"),
     AdminManager("AdminManagerImpl"),
+    ResourceManager("ResourceManager"),
     UserManager("UserManagerImpl"),
     CalendarManager("CalendarManagerImpl");
 

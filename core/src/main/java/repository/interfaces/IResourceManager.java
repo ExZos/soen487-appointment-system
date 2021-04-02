@@ -6,7 +6,7 @@ import repository.pojos.User;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-public interface IResourceManager {
+public interface IResourceManager extends IManager {
     ArrayList<Resource> getResourceList() throws SQLException;
     Resource getResourceById(int resourceId) throws SQLException;
     Resource getResourceByName(String name) throws SQLException;
