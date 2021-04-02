@@ -20,38 +20,39 @@ public class AppointmentRest {
     IUserManager userManager = (IUserManager) ManagerFactory.UserManager.getManager();
     ICalendarManager calendarManager = (ICalendarManager) ManagerFactory.CalendarManager.getManager();
 
-    //ADMIN CREATES APPOINTMENTS WITH RESOURCES
-    @POST
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("create")
-    public Response create(@HeaderParam("x-api-key") String token, @HeaderParam("username") String username, @FormParam("resourceId") int resourceId, @FormParam("date") String date ) {
-        try {
-            LocalDate localDate = LocalDate.parse(date);
-            if(adminManager.validateToken(username, token))
-            {
-                if(resourceManager.getResourceById(resourceId) == null)
-                {
-                    return Response.status(Response.Status.BAD_REQUEST)
-                            .build();
-                }
-                else{
-                    return Response.status(Response.Status.OK)
-                            .entity(appointmentManager.createAppointment(resourceId, localDate))
-                            .build();
-                }
-            }
-            else{
-                return Response.status(Response.Status.FORBIDDEN)
-                        .build();
-            }
+//    //ADMIN CREATES APPOINTMENTS WITH RESOURCES
+//    @POST
+//    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+//    @Produces(MediaType.APPLICATION_JSON)
+//    @Path("create")
+//    public Response create(@HeaderParam("x-api-key") String token, @HeaderParam("username") String username, @FormParam("resourceId") int resourceId, @FormParam("date") String date ) {
+//        try {
+//            LocalDate localDate = LocalDate.parse(date);
+//            if(adminManager.validateToken(username, token))
+//            {
+//                if(resourceManager.getResourceById(resourceId) == null)
+//                {
+//                    return Response.status(Response.Status.BAD_REQUEST)
+//                            .build();
+//                }
+//                else{
+//                    return Response.status(Response.Status.OK)
+//                            .entity(appointmentManager.createAppointment(resourceId, localDate))
+//                            .build();
+//                }
+//            }
+//            else{
+//                return Response.status(Response.Status.FORBIDDEN)
+//                        .build();
+//            }
+//
+//        } catch(Exception e) {
+//            e.printStackTrace();
+//            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+//                    .build();
+//        }
+//    }
 
-        } catch(Exception e) {
-            e.printStackTrace();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .build();
-        }
-    }
     //Customer can book an appointment
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -95,12 +96,19 @@ public class AppointmentRest {
             User user = userManager.getUserByEmail(email);
             if (appointment.getUserId() == userId && userManager.validateToken(email, token)) {
                 boolean success = calendarManager.deleteEventOnDate(new OAuth2AccessToken(user.getToken()), appointment.getDate());
-                if(!success)
+                if (!success)
                     throw new Exception("Failed to delete event");
 
-                return Response.status(Response.Status.OK)
-                        .entity(appointmentManager.cancelAppointment(appointmentId))
-                        .build();
+                Appointment cancelledAppointment = appointmentManager.cancelAppointment(appointmentId);
+                if (cancelledAppointment.getStatus().toString().equals("OPEN")) {
+                    return Response.status(Response.Status.OK)
+                            .entity(cancelledAppointment)
+                            .build();
+                } else {
+                    return Response.status(Response.Status.FORBIDDEN)
+                            .build();
+                }
+
             } else {
                 return Response.status(Response.Status.FORBIDDEN)
                         .build();
