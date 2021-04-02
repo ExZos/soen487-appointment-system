@@ -25,7 +25,7 @@ public class ResourceRest {
     public Response create(@HeaderParam("x-api-key") String token, @HeaderParam("username") String username, @FormParam("name") String name) {
         try {
             if(name == null)
-                return Response.status(Response.Status.FORBIDDEN)
+                return Response.status(Response.Status.BAD_REQUEST)
                         .build();
             if(adminManager.validateToken(username, token))
             {
