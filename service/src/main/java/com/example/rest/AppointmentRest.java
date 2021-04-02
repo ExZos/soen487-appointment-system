@@ -66,13 +66,20 @@ public class AppointmentRest {
                 User user = userManager.getUserByEmail(email);
                 Resource resource = resourceManager.getResourceById(appointment.getResourceId());
 
-                boolean success = calendarManager.createEventOnDate(new OAuth2AccessToken(user.getToken()), resource.getName(), appointment.getDate());
-                if(!success)
-                    throw new Exception("Failed to create event");
+                if(appointment.getStatus().toString().equals("CLOSED"))
+                {
+                    return Response.status(Response.Status.FORBIDDEN)
+                            .build();
+                }
+                else{
+                    boolean success = calendarManager.createEventOnDate(new OAuth2AccessToken(user.getToken()), resource.getName(), appointment.getDate());
+                    if(!success)
+                        throw new Exception("Failed to create event");
 
-                return Response.status(Response.Status.OK)
-                        .entity(appointmentManager.bookAppointment(appointmentId, userId, message))
-                        .build();
+                    return Response.status(Response.Status.OK)
+                            .entity(appointmentManager.bookAppointment(appointmentId, userId, message))
+                            .build();
+                }
             }
             else{
                 return Response.status(Response.Status.FORBIDDEN)
