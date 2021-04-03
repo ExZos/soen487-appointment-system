@@ -1,6 +1,13 @@
 package repository.pojos;
 
-public class User {
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
+
+@XmlRootElement
+public class User implements Serializable {
+    @JsonIgnore
     private int userId;
     private String email;
     private String token;
