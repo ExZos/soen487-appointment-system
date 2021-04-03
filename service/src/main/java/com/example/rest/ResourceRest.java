@@ -36,23 +36,8 @@ public class ResourceRest {
             if(adminManager.validateToken(username, token))
             {
                 Resource resource = resourceManager.createResource(name);
-                YearMonth yearMonthObject = YearMonth.of(2021, 4);
-                int daysInMonth = yearMonthObject.lengthOfMonth();
-                LocalDate currentDate = LocalDate.now();
-                int dayOfMonth = currentDate.getDayOfMonth();
 
-                int year = 2021;
-                int month = 4;
-
-                for(; dayOfMonth <= daysInMonth; dayOfMonth++)
-                {
-                    LocalDate localDate = LocalDate.of(year, month, dayOfMonth);
-                    java.time.DayOfWeek dayOfWeek = localDate.getDayOfWeek();
-                    if(!dayOfWeek.equals(DayOfWeek.SATURDAY) && !dayOfWeek.equals(DayOfWeek.SUNDAY))
-                    {
-                        appointmentManager.createAppointment(resource.getResourceId(), LocalDate.of(year, month, dayOfMonth));
-                    }
-                }
+                appointmentManager.createResourceAppointments(resource);
 
                 return Response.status(Response.Status.OK)
                         .entity(resource)
