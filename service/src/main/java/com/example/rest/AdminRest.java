@@ -2,6 +2,7 @@ package com.example.rest;
 
 import factories.ManagerFactory;
 import repository.interfaces.IAdminManager;
+import repository.pojos.Admin;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -21,8 +22,10 @@ public class AdminRest {
                 return Response.status(Response.Status.FORBIDDEN)
                         .build();
 
+            Admin admin = adminManager.getAdminByUsername(username);
+
             return Response.status(Response.Status.OK)
-                    .entity(token)
+                    .entity(admin)
                     .build();
         } catch(Exception e) {
             e.printStackTrace();
