@@ -1,11 +1,15 @@
-import {useLocation} from 'react-router';
+import {useEffect} from 'react';
 
-function Home() {
-    const location = useLocation();
+function Home(props) {
+    useEffect(() => {
+        console.log(props?.user);
+    }, [props]);
 
     return (
         <div id="home">
-            {location.state.token}
+            <h3>Home</h3>
+
+            {props?.user?.token}
         </div>
     );
 }
