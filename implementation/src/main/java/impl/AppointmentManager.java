@@ -53,14 +53,14 @@ public class AppointmentManager implements IAppointmentManager {
         return AppointmentDAO.getResourceAppointments(id);
     }
     //Create appointment for a new resource for the next 30 days (except weekends)
-    public void createResourceAppointments(Resource resource) throws SQLException {
+    public void createResourceAppointments(int resourceId) throws SQLException {
         LocalDate date = LocalDate.now();
         for(int i = 0; i <= 30; i++)
         {
             java.time.DayOfWeek dayOfWeek = date.getDayOfWeek();
             if(!dayOfWeek.equals(DayOfWeek.SATURDAY) && !dayOfWeek.equals(DayOfWeek.SUNDAY))
             {
-                createAppointment(resource.getResourceId(), date);
+                createAppointment(resourceId, date);
             }
             date = date.plusDays(1);
         }

@@ -37,7 +37,7 @@ public class ResourceRest {
             {
                 Resource resource = resourceManager.createResource(name);
 
-                appointmentManager.createResourceAppointments(resource);
+                appointmentManager.createResourceAppointments(resource.getResourceId());
 
                 return Response.status(Response.Status.OK)
                         .entity(resource)
