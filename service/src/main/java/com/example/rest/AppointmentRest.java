@@ -127,4 +127,49 @@ public class AppointmentRest {
                     .build();
         }
     }
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("update")
+    public Response update(@HeaderParam("x-api-key") String token, @HeaderParam("email") String email, @FormParam("appointmentId") int appointmentId, @FormParam("newAppointmentId") int newAppointmentId,
+                           @FormParam("userId") int userId,
+                           @FormParam("message") String message) {
+        try {
+            Appointment appointment = appointmentManager.getAppointment(appointmentId);
+            User user = userManager.getUserByEmail(email);
+            if (appointment.getUserId() == userId && userManager.validateToken(email, token)) {
+                Appointment newAppointment = appointmentManager.getAppointment(newAppointmentId);
+
+                if(newAppointment.getStatus().toString().equals("OPEN"))
+                {
+                    appointmentManager.cancelAppointment(appointmentId);
+                    newAppointment = appointmentManager.bookAppointment(newAppointmentId, userId, message);
+
+                    LocalDate from = appointment.getDate();
+                    LocalDate to = newAppointment.getDate();
+                    boolean success = calendarManager.updateEventOnDate(new OAuth2AccessToken(user.getToken()), from, to);
+                    if(!success)
+                        throw new Exception("Failed to move event");
+
+                    return Response.status(Response.Status.OK)
+                            .entity(newAppointment)
+                            .build();
+                }
+                else
+                {
+                    return Response.status(Response.Status.BAD_REQUEST)
+                            .build();
+                }
+            }
+            else {
+                return Response.status(Response.Status.FORBIDDEN)
+                        .build();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .build();
+        }
+    }
 }
