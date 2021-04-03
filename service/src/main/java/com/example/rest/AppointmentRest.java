@@ -15,50 +15,16 @@ import java.time.LocalDate;
 @Path("appointment")
 public class AppointmentRest {
     IAppointmentManager appointmentManager = (IAppointmentManager) ManagerFactory.AppointmentManager.getManager();
-    IAdminManager adminManager = (IAdminManager) ManagerFactory.AdminManager.getManager();
     IResourceManager resourceManager = (IResourceManager) ManagerFactory.ResourceManager.getManager();
     IUserManager userManager = (IUserManager) ManagerFactory.UserManager.getManager();
     ICalendarManager calendarManager = (ICalendarManager) ManagerFactory.CalendarManager.getManager();
-
-//    //ADMIN CREATES APPOINTMENTS WITH RESOURCES
-//    @POST
-//    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-//    @Produces(MediaType.APPLICATION_JSON)
-//    @Path("create")
-//    public Response create(@HeaderParam("x-api-key") String token, @HeaderParam("username") String username, @FormParam("resourceId") int resourceId, @FormParam("date") String date ) {
-//        try {
-//            LocalDate localDate = LocalDate.parse(date);
-//            if(adminManager.validateToken(username, token))
-//            {
-//                if(resourceManager.getResourceById(resourceId) == null)
-//                {
-//                    return Response.status(Response.Status.BAD_REQUEST)
-//                            .build();
-//                }
-//                else{
-//                    return Response.status(Response.Status.OK)
-//                            .entity(appointmentManager.createAppointment(resourceId, localDate))
-//                            .build();
-//                }
-//            }
-//            else{
-//                return Response.status(Response.Status.FORBIDDEN)
-//                        .build();
-//            }
-//
-//        } catch(Exception e) {
-//            e.printStackTrace();
-//            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-//                    .build();
-//        }
-//    }
 
     //Customer can book an appointment
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("book")
-    public Response book(@HeaderParam("x-api-key") String token, @HeaderParam("email") String email, @FormParam("appointmentId") int appointmentId, @FormParam("userId") int userId, @FormParam("message") String message ) {
+    public Response book(@HeaderParam("x-api-key") String token, @HeaderParam("email") String email, @FormParam("appointmentId") int appointmentId, @FormParam("message") String message ) {
         try {
             if(userManager.validateToken(email, token))
             {
@@ -77,7 +43,7 @@ public class AppointmentRest {
                         throw new Exception("Failed to create event");
 
                     return Response.status(Response.Status.OK)
-                            .entity(appointmentManager.bookAppointment(appointmentId, userId, message))
+                            .entity(appointmentManager.bookAppointment(appointmentId, user.getUserId(), message))
                             .build();
                 }
             }
@@ -97,11 +63,11 @@ public class AppointmentRest {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("cancel")
-    public Response cancel(@HeaderParam("x-api-key") String token, @HeaderParam("email") String email, @FormParam("appointmentId") int appointmentId, @FormParam("userId") int userId) {
+    public Response cancel(@HeaderParam("x-api-key") String token, @HeaderParam("email") String email, @FormParam("appointmentId") int appointmentId) {
         try {
             Appointment appointment = appointmentManager.getAppointment(appointmentId);
             User user = userManager.getUserByEmail(email);
-            if (appointment.getUserId() == userId && userManager.validateToken(email, token)) {
+            if (appointment.getUserId() == user.getUserId() && userManager.validateToken(email, token)) {
                 boolean success = calendarManager.deleteEventOnDate(new OAuth2AccessToken(user.getToken()), appointment.getDate());
                 if (!success)
                     throw new Exception("Failed to delete event");
@@ -131,19 +97,17 @@ public class AppointmentRest {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("update")
-    public Response update(@HeaderParam("x-api-key") String token, @HeaderParam("email") String email, @FormParam("appointmentId") int appointmentId, @FormParam("newAppointmentId") int newAppointmentId,
-                           @FormParam("userId") int userId,
-                           @FormParam("message") String message) {
+    public Response update(@HeaderParam("x-api-key") String token, @HeaderParam("email") String email, @FormParam("appointmentId") int appointmentId, @FormParam("newAppointmentId") int newAppointmentId, @FormParam("message") String message) {
         try {
             Appointment appointment = appointmentManager.getAppointment(appointmentId);
             User user = userManager.getUserByEmail(email);
-            if (appointment.getUserId() == userId && userManager.validateToken(email, token)) {
+            if (appointment.getUserId() == user.getUserId() && userManager.validateToken(email, token)) {
                 Appointment newAppointment = appointmentManager.getAppointment(newAppointmentId);
 
                 if(newAppointment.getStatus().toString().equals("OPEN"))
                 {
                     appointmentManager.cancelAppointment(appointmentId);
-                    newAppointment = appointmentManager.bookAppointment(newAppointmentId, userId, message);
+                    newAppointment = appointmentManager.bookAppointment(newAppointmentId, user.getUserId(), message);
 
                     LocalDate from = appointment.getDate();
                     LocalDate to = newAppointment.getDate();
