@@ -4,7 +4,7 @@ import {Route} from 'react-router-dom';
 import {CircularProgress} from '@material-ui/core';
 
 import {getSession} from '../../utilities/sessionUtils';
-import {auth} from '../../utilities/authUtils';
+import {authCall} from '../../utilities/authUtils';
 
 function ClientRoute({component: Component, ...rest}) {
     const [user] = useState(getSession.user());
@@ -12,17 +12,25 @@ function ClientRoute({component: Component, ...rest}) {
     const [isLoaded, setIsLoaded] = useState(false);
 
     useEffect(() => {
-        auth.isClient(user?.email, user?.token)
+        authCall.client(user?.email, user?.token)
             .then(res => setIsAuth(res.data))
             .catch(() => setIsAuth(false))
             .finally(() => setIsLoaded(true));
     }, [user, isLoaded]);
 
+    const renderCircularProgress = () => {
+        return (
+            <div className="text-center mt-5">
+                <CircularProgress />
+            </div>
+        );
+    };
+
     return (
         <Route {...rest} render={props => (
             isLoaded ?
                 isAuth ? <Component user={user} {...props} /> : <Redirect push to="/" /> :
-                <CircularProgress />
+                renderCircularProgress()
         )} />
     );
 

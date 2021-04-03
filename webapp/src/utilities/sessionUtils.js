@@ -25,7 +25,13 @@ export const getSession = {
     user: function() {
         return JSON.parse(sessionStorage.getItem(userSessionKey));
     }
-}
+};
+
+export const removeSession = {
+    user: function() {
+        sessionStorage.removeItem(userSessionKey);
+    }
+};
 
 function updateUserSessionKey(key, value) {
     let user = getSession.user();

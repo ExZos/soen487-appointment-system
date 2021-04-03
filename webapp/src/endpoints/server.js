@@ -9,7 +9,9 @@ export const server = axios.create({
 export const api = {
     adminAuth: '/admin/auth',
     adminLogin: '/admin/login',
+    adminLogout: '/admin/logout',
     userAuth: '/user/auth',
     userLogin: '/user/login',
-    userToken: '/user/token'
+    userToken: '/user/token',
+    userLogout: '/user/logout'
 };

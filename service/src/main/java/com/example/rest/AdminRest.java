@@ -1,5 +1,6 @@
 package com.example.rest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import factories.ManagerFactory;
 import repository.interfaces.IAdminManager;
 import repository.pojos.Admin;
@@ -14,18 +15,24 @@ public class AdminRest {
 
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_JSON)
     @Path("login")
     public Response login(@FormParam("username") String username, @FormParam("password") String password) {
         try {
+            if(username == null || password == null)
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .build();
+
             String token = adminManager.login(username, password);
             if(token == null)
                 return Response.status(Response.Status.FORBIDDEN)
                         .build();
 
             Admin admin = adminManager.getAdminByUsername(username);
+            ObjectMapper mapper = new ObjectMapper();
 
             return Response.status(Response.Status.OK)
-                    .entity(admin)
+                    .entity(mapper.writeValueAsBytes(admin))
                     .build();
         } catch(Exception e) {
             e.printStackTrace();

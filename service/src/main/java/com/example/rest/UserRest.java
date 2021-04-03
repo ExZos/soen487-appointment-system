@@ -1,11 +1,11 @@
 package com.example.rest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.scribejava.core.model.OAuth2AccessToken;
 import factories.ManagerFactory;
 import repository.interfaces.ISSOManager;
 import repository.interfaces.IUserManager;
 import repository.pojos.User;
-import utilities.UserAgentUtils;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -16,11 +16,10 @@ public class UserRest {
     private ISSOManager ssoManager = (ISSOManager) ManagerFactory.GoogleSSOManager.getManager();
     private IUserManager userManager = (IUserManager) ManagerFactory.UserManager.getManager();
 
-    @POST
+    @GET
     @Path("login")
-    public Response login(@HeaderParam("User-Agent") String userAgent) {
+    public Response login(@HeaderParam("User-Agent") String userAgent, @QueryParam("isWebOrigin") boolean isWebOrigin) {
         try {
-            boolean isWebOrigin = UserAgentUtils.isWebUserAgent(userAgent);
             String authUrl = ssoManager.getAuthorizationUrl(isWebOrigin);
 
             return Response.status(Response.Status.OK)
@@ -34,10 +33,10 @@ public class UserRest {
     }
 
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
     @Path("token")
-    public Response getToken(@HeaderParam("User-Agent") String userAgent, @QueryParam("code") String code) {
+    public Response getToken(@HeaderParam("User-Agent") String userAgent, @QueryParam("code") String code, @QueryParam("isWebOrigin") boolean isWebOrigin) {
         try {
-            boolean isWebOrigin = UserAgentUtils.isWebUserAgent(userAgent);
             OAuth2AccessToken accessToken = ssoManager.getAccessToken(code, isWebOrigin);
             String email = ssoManager.getLoginEmail(accessToken);
             User user = userManager.getUserByEmail(email);
@@ -47,8 +46,10 @@ public class UserRest {
             else
                 user.setToken(userManager.updateUserToken(email, accessToken.getAccessToken()));
 
+            ObjectMapper mapper = new ObjectMapper();
+
             return Response.status(Response.Status.OK)
-                    .entity(user)
+                    .entity(mapper.writeValueAsString(user))
                     .build();
         } catch(Exception e) {
             e.printStackTrace();

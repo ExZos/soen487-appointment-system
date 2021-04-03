@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useRef} from 'react';
 import {useHistory, useLocation} from 'react-router';
 import {Button, Card, CardContent, CardHeader, CircularProgress, withStyles} from '@material-ui/core';
 
@@ -21,9 +21,8 @@ function Login() {
     const code = useRef(new URLSearchParams(location.search).get('code'));
 
     useEffect(() => {
-        console.log()
-        if(code.current) {
-            server.get(api.userToken + '?code=' + encodeURIComponent(code.current))
+        const getUserToken = () => {
+            server.get(api.userToken + '?code=' + encodeURIComponent(code.current) + '&isWebOrigin=true')
                 .then(res => {
                     const user = res.data;
                     setSession.user({
@@ -38,11 +37,15 @@ function Login() {
                     code.current = null;
                     history.push('/');
                 });
-        }
-    }, [location, history]);
+        };
+
+        if(code.current)
+            getUserToken();
+
+    }, [history, location]);
 
     const userLogin = () => {
-        server.post(api.userLogin)
+        server.get(api.userLogin + '?isWebOrigin=true')
             .then(res => window.location.assign(res.data))
             .catch(err => console.log(err));
     };
@@ -51,7 +54,7 @@ function Login() {
         history.push('/admin/login');
     };
 
-    // Means that its coming from
+    // Means that its coming from the Google SSO
     if(code.current)
         return (
             <div className="text-center mt-5">
