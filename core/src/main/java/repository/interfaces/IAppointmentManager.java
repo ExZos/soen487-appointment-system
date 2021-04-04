@@ -1,13 +1,14 @@
 package repository.interfaces;
 
 import repository.pojos.Appointment;
+import repository.pojos.Resource;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 
-public interface IAppointmentManager {
+public interface IAppointmentManager extends IManager{
     ArrayList<Appointment> getUserAppointments(int userId) throws SQLException;
     Appointment getAppointment(int appointmentId) throws SQLException;
     Appointment createAppointment(int resourceId, LocalDate date) throws SQLException;
@@ -15,4 +16,5 @@ public interface IAppointmentManager {
     Appointment cancelAppointment(int appointmentId) throws SQLException;
     //ArrayList<Appointment> getResourceAppointments(String name) throws SQLException;
     ArrayList<Appointment> getResourceAppointments(int id) throws SQLException;
+    void createResourceAppointments(int resourceId) throws SQLException;
 }

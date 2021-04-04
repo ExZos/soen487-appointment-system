@@ -2,6 +2,7 @@ package com.example.rest;
 
 import factories.ManagerFactory;
 import repository.interfaces.IAdminManager;
+import repository.interfaces.IAppointmentManager;
 import repository.interfaces.IResourceManager;
 import repository.interfaces.IUserManager;
 import repository.pojos.Resource;
@@ -10,6 +11,10 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.util.Calendar;
 import java.util.List;
 
 @Path("resource")
@@ -17,6 +22,7 @@ public class ResourceRest {
     IResourceManager resourceManager = (IResourceManager) ManagerFactory.ResourceManager.getManager();
     IAdminManager adminManager = (IAdminManager) ManagerFactory.AdminManager.getManager();
     IUserManager userManager = (IUserManager) ManagerFactory.UserManager.getManager();
+    IAppointmentManager appointmentManager = (IAppointmentManager) ManagerFactory.AppointmentManager.getManager();
 
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -29,8 +35,12 @@ public class ResourceRest {
                         .build();
             if(adminManager.validateToken(username, token))
             {
+                Resource resource = resourceManager.createResource(name);
+
+                appointmentManager.createResourceAppointments(resource.getResourceId());
+
                 return Response.status(Response.Status.OK)
-                        .entity(resourceManager.createResource(name))
+                        .entity(resource)
                         .build();
             }
             else{

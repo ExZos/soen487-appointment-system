@@ -3,9 +3,12 @@ package impl;
 import database.dao.AppointmentDAO;
 import repository.interfaces.IAppointmentManager;
 import repository.pojos.Appointment;
+import repository.pojos.Resource;
 
 import java.sql.SQLException;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.ArrayList;
 
 public class AppointmentManager implements IAppointmentManager {
@@ -48,6 +51,19 @@ public class AppointmentManager implements IAppointmentManager {
 
     public ArrayList<Appointment> getResourceAppointments(int id) throws SQLException {
         return AppointmentDAO.getResourceAppointments(id);
+    }
+    //Create appointment for a new resource for the next 30 days (except weekends)
+    public void createResourceAppointments(int resourceId) throws SQLException {
+        LocalDate date = LocalDate.now();
+        for(int i = 0; i <= 30; i++)
+        {
+            java.time.DayOfWeek dayOfWeek = date.getDayOfWeek();
+            if(!dayOfWeek.equals(DayOfWeek.SATURDAY) && !dayOfWeek.equals(DayOfWeek.SUNDAY))
+            {
+                createAppointment(resourceId, date);
+            }
+            date = date.plusDays(1);
+        }
     }
 
 //    public static void main(String[] args) {

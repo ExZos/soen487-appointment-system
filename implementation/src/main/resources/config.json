@@ -1,7 +1,8 @@
 {
   "GoogleSSOManagerImpl": "impl.GoogleSSOManager",
   "AdminManagerImpl": "impl.AdminManager",
-  "ResourceManager": "impl.ResourceManager",
+  "ResourceManagerImpl": "impl.ResourceManager",
   "UserManagerImpl": "impl.UserManager",
+  "AppointmentManagerImpl": "impl.AppointmentManager",
   "CalendarManagerImpl": "impl.CalendarAPIManager"
 }
