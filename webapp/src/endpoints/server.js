@@ -10,8 +10,13 @@ export const api = {
     adminAuth: '/admin/auth',
     adminLogin: '/admin/login',
     adminLogout: '/admin/logout',
+
     userAuth: '/user/auth',
     userLogin: '/user/login',
     userToken: '/user/token',
-    userLogout: '/user/logout'
+    userLogout: '/user/logout',
+
+    listResourceAppointments: '',
+    listResources: '/resource',
+    addResource: '/resource/create'
 };
