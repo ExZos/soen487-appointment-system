@@ -33,20 +33,15 @@ public class GoogleSSOManager implements ISSOManager {
         clientId = (String) jo.get("client_id");
         clientSecret = (String) jo.get("client_secret");
         appScopes = (String) jo.get("app_scopes");
-        redirectURI = (String) jo.get("redirect_uris");
-
-        service = new ServiceBuilder(clientId)
-                .apiSecret(clientSecret)
-                .defaultScope(appScopes)
-                .callback(redirectURI)
-                .build(GoogleApi20.instance());
     }
 
-    public String getAuthorizationUrl() {
+    public String getAuthorizationUrl(boolean isWebOrigin) throws IOException, ParseException {
+        service = buildOAuth20Service(isWebOrigin);
         return service.getAuthorizationUrl();
     }
 
-    public OAuth2AccessToken getAccessToken(String code) throws IOException, InterruptedException, ExecutionException {
+    public OAuth2AccessToken getAccessToken(String code, boolean isWebOrigin) throws IOException, ParseException, InterruptedException, ExecutionException {
+        service = buildOAuth20Service(isWebOrigin);
         return service.getAccessToken(code);
     }
 
@@ -63,5 +58,19 @@ public class GoogleSSOManager implements ISSOManager {
                 .execute();
 
         return userinfo.getEmail();
+    }
+
+    private OAuth20Service buildOAuth20Service(boolean isWebOrigin) throws IOException, ParseException{
+        if(isWebOrigin)
+            redirectURI = ConfigReader.GOOGLE_CREDS_FILE.getConfigFileKey("web_redirect_uris");
+        else
+            redirectURI = ConfigReader.GOOGLE_CREDS_FILE.getConfigFileKey("default_redirect_uris");
+
+        return new ServiceBuilder(clientId)
+                .apiSecret(clientSecret)
+                .defaultScope(appScopes)
+                .callback(redirectURI)
+                .build(GoogleApi20.instance());
+
     }
 }

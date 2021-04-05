@@ -1,12 +1,20 @@
 package repository.pojos;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class Admin {
+@XmlRootElement
+public class Admin implements Serializable {
+    @JsonIgnore
     private Integer adminId;
     private String username;
+    @JsonIgnore
     private String password;
     private String token;
+    @JsonIgnore
     private LocalDateTime tokenCreated;
 
     public Admin() { }
