@@ -24,6 +24,35 @@ public class AppointmentDAO {
 
         return appointments;
     }
+    public static ArrayList<Appointment> getAppointments() throws SQLException {
+        ArrayList<Appointment> appointments = new ArrayList<>();
+
+        Connection conn = DBConnection.getConnection();
+
+        String sql = "SELECT * FROM Appointment";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        ResultSet rs = stmt.executeQuery();
+
+        while(rs.next())
+            appointments.add(mapResultSetToAppointment(rs));
+
+        return appointments;
+    }
+    public static ArrayList<Appointment> getOpenAppointments() throws SQLException {
+        ArrayList<Appointment> appointments = new ArrayList<>();
+
+        Connection conn = DBConnection.getConnection();
+        String status = "OPEN";
+        String sql = "SELECT * FROM Appointment WHERE STATUS = ?";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setString(1, status);
+        ResultSet rs = stmt.executeQuery();
+
+        while(rs.next())
+            appointments.add(mapResultSetToAppointment(rs));
+
+        return appointments;
+    }
 
     /**
      * THIS IS TO CREATE AN OPEN SLOT WITH A RESOURCE SO A CUSTOMER CAN BOOK AN APPOINTMENT WITH!!

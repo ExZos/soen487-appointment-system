@@ -52,6 +52,12 @@ public class AppointmentManager implements IAppointmentManager {
     public ArrayList<Appointment> getResourceAppointments(int id) throws SQLException {
         return AppointmentDAO.getResourceAppointments(id);
     }
+    public ArrayList<Appointment> getAppointments() throws SQLException {
+        return AppointmentDAO.getAppointments();
+    }
+    public ArrayList<Appointment> getOpenAppointments() throws SQLException {
+        return AppointmentDAO.getOpenAppointments();
+    }
     //Create appointment for a new resource for the next 30 days (except weekends)
     public void createResourceAppointments(int resourceId) throws SQLException {
         LocalDate date = LocalDate.now();
