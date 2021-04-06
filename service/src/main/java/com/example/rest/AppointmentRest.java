@@ -150,7 +150,7 @@ public class AppointmentRest {
         try {
             User user = userManager.getUserByEmail(email);
             boolean userValid = false;
-            if(userManager.validateToken(email, token))
+            if(userManager.validateToken(email, token) && user.getUserId() == userId)
             {
                 userValid = true;
             }
@@ -210,6 +210,29 @@ public class AppointmentRest {
                         .build();
             }
             else{
+                return Response.status(Response.Status.FORBIDDEN)
+                        .build();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .build();
+        }
+    }
+    @GET
+    @Path("resourceAppointments/{resourceId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getResourceAppointments(@HeaderParam("x-api-key") String token, @HeaderParam("username") String username, @PathParam("resourceId") int resourceId) {
+        try {
+            if (adminManager.validateToken(username, token)) {
+                List<Appointment> appointments = appointmentManager.getResourceAppointments(resourceId);
+                GenericEntity<List<Appointment>> entity = new GenericEntity<List<Appointment>>(appointments) {
+                };
+
+                return Response.status(Response.Status.OK)
+                        .entity(entity)
+                        .build();
+            } else {
                 return Response.status(Response.Status.FORBIDDEN)
                         .build();
             }
