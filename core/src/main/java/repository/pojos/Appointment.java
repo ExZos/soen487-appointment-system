@@ -12,16 +12,18 @@ public class Appointment {
     private int resourceId;
     private int userId;
     private LocalDate date;
+    private String email;
     private String message;
     private Status status;
 
     public Appointment() { }
 
-    public Appointment(int appointmentId, int resourceId, int userId, LocalDate date, String message, Status status) {
+    public Appointment(int appointmentId, int resourceId, int userId, LocalDate date, String email, String message, Status status) {
         this.appointmentId = appointmentId;
         this.resourceId = resourceId;
         this.userId = userId;
         this.date = date;
+        this.email = email;
         this.message = message;
         this.status =  status;
     }
@@ -37,6 +39,9 @@ public class Appointment {
 
     public LocalDate getDate(){ return date;}
     public void setDate(LocalDate date){ this.date = date;}
+
+    public String getEmail(){ return email;}
+    public void setEmail(String email){ this.email = email;}
 
     public String getMessage(){ return message;}
     public void setMessage(String message){ this.message = message;}

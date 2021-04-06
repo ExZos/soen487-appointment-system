@@ -2,6 +2,7 @@ package database.dao;
 
 import database.db.DBConnection;
 import repository.pojos.Appointment;
+import repository.pojos.User;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -154,7 +155,8 @@ public class AppointmentDAO {
         Appointment appointment = new Appointment();
         appointment.setAppointmentId(rs.getInt("id"));
         appointment.setResourceId(rs.getInt("resourceId"));
-        appointment.setUserId(rs.getInt("userId"));
+        int userId = rs.getInt("userId");
+        appointment.setUserId(userId);
         appointment.setDate(rs.getDate("appointmentDate").toLocalDate());
         appointment.setMessage(rs.getString("message"));
         String status = rs.getString("status");
@@ -166,6 +168,10 @@ public class AppointmentDAO {
         else
         {
             appointment.setStatus(Appointment.Status.CLOSED);
+        }
+        if(userId != 0){
+            User user = UserDAO.selectUserById(userId);
+            appointment.setEmail(user.getEmail());
         }
 
         return appointment;

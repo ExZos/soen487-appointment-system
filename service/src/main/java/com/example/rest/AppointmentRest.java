@@ -143,6 +143,7 @@ public class AppointmentRest {
     /**
      * NEWLY ADDED CODE BELOW THIS!!
      */
+    //User can view their OWN appointments
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("user/{userId}")
@@ -169,28 +170,7 @@ public class AppointmentRest {
                     .build();
         }
     }
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getAppointments(@HeaderParam("x-api-key") String token, @HeaderParam("username") String username) {
-        try {
-            if(adminManager.validateToken(username, token)) {
-                List<Appointment> appointments = appointmentManager.getAppointments();
-                GenericEntity<List<Appointment>> entity = new GenericEntity<List<Appointment>>(appointments) {};
-
-                return Response.status(Response.Status.OK)
-                        .entity(entity)
-                        .build();
-            }
-            else{
-                return Response.status(Response.Status.FORBIDDEN)
-                        .build();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .build();
-        }
-    }
+    //Display all open appointments with all resources
     @GET
     @Path("openAppointments")
     @Produces(MediaType.APPLICATION_JSON)
@@ -214,6 +194,7 @@ public class AppointmentRest {
                     .build();
         }
     }
+    //Display ALL appointments from a specific resource
     @GET
     @Path("resourceAppointments/{resourceId}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -237,6 +218,7 @@ public class AppointmentRest {
                     .build();
         }
     }
+    //Display OPEN appointments with a specific resource
     @GET
     @Path("resourceAppointments/open/{resourceId}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -260,14 +242,15 @@ public class AppointmentRest {
                     .build();
         }
     }
-    //Get appointment detail
+    //Get appointment detail : Admin can view any appointment detail. User can only view theirs.
     @GET
     @Path("{appointmentId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAppointmentDetail(@HeaderParam("x-api-key") String token, @HeaderParam("username") String username, @PathParam("appointmentId") int appointmentId) {
+    public Response getAppointmentDetail(@HeaderParam("x-api-key") String token, @HeaderParam("username") String username, @HeaderParam("email") String email, @PathParam("appointmentId") int appointmentId) {
         try {
-            if(adminManager.validateToken(username, token)) {
-                Appointment appointment = appointmentManager.getAppointment(appointmentId);
+            User user = userManager.getUserByEmail(email);
+            Appointment appointment = appointmentManager.getAppointment(appointmentId);
+            if(adminManager.validateToken(username, token) || appointment.getEmail().equals(user.getEmail())) {
 
                 return Response.status(Response.Status.OK)
                         .entity(appointment)
