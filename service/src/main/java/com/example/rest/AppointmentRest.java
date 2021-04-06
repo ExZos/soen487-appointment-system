@@ -8,9 +8,11 @@ import repository.pojos.Resource;
 import repository.pojos.User;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.time.LocalDate;
+import java.util.List;
 
 @Path("appointment")
 public class AppointmentRest {
@@ -18,6 +20,7 @@ public class AppointmentRest {
     IResourceManager resourceManager = (IResourceManager) ManagerFactory.ResourceManager.getManager();
     IUserManager userManager = (IUserManager) ManagerFactory.UserManager.getManager();
     ICalendarManager calendarManager = (ICalendarManager) ManagerFactory.CalendarManager.getManager();
+    IAdminManager adminManager = (IAdminManager) ManagerFactory.AdminManager.getManager();
 
     //Customer can book an appointment
     @POST
@@ -130,6 +133,132 @@ public class AppointmentRest {
                         .build();
             }
 
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .build();
+        }
+    }
+
+    /**
+     * NEWLY ADDED CODE BELOW THIS!!
+     */
+    //User can view their OWN appointments
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("user/{userId}")
+    public Response getUserAppointments(@HeaderParam("x-api-key") String token, @HeaderParam("email") String email) {
+        try {
+            User user = userManager.getUserByEmail(email);
+
+            if(userManager.validateToken(email, token))
+            {
+                List<Appointment> appointments = appointmentManager.getUserAppointments(user.getUserId());
+                GenericEntity<List<Appointment>> entity = new GenericEntity<List<Appointment>>(appointments) {};
+                return Response.status(Response.Status.OK)
+                        .entity(entity)
+                        .build();
+            }
+            else{
+                return Response.status(Response.Status.FORBIDDEN)
+                        .build();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .build();
+        }
+    }
+    //Display all open appointments with all resources
+    @GET
+    @Path("openAppointments")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getOpenAppointments(@HeaderParam("x-api-key") String token, @HeaderParam("email") String email) {
+        try {
+            if(userManager.validateToken(email, token)) {
+                List<Appointment> appointments = appointmentManager.getOpenAppointments();
+                GenericEntity<List<Appointment>> entity = new GenericEntity<List<Appointment>>(appointments) {};
+
+                return Response.status(Response.Status.OK)
+                        .entity(entity)
+                        .build();
+            }
+            else{
+                return Response.status(Response.Status.FORBIDDEN)
+                        .build();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .build();
+        }
+    }
+    //Display ALL appointments from a specific resource
+    @GET
+    @Path("resourceAppointments/{resourceId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getResourceAppointments(@HeaderParam("x-api-key") String token, @HeaderParam("username") String username, @PathParam("resourceId") int resourceId) {
+        try {
+            if (adminManager.validateToken(username, token)) {
+                List<Appointment> appointments = appointmentManager.getResourceAppointments(resourceId);
+                GenericEntity<List<Appointment>> entity = new GenericEntity<List<Appointment>>(appointments) {
+                };
+
+                return Response.status(Response.Status.OK)
+                        .entity(entity)
+                        .build();
+            } else {
+                return Response.status(Response.Status.FORBIDDEN)
+                        .build();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .build();
+        }
+    }
+    //Display OPEN appointments with a specific resource
+    @GET
+    @Path("resourceAppointments/open/{resourceId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getOpenResourceAppointments(@HeaderParam("x-api-key") String token, @HeaderParam("email") String email, @PathParam("resourceId") int resourceId) {
+        try {
+            if (userManager.validateToken(email, token)) {
+                List<Appointment> appointments = appointmentManager.getOpenResourceAppointments(resourceId);
+                GenericEntity<List<Appointment>> entity = new GenericEntity<List<Appointment>>(appointments) {
+                };
+
+                return Response.status(Response.Status.OK)
+                        .entity(entity)
+                        .build();
+            } else {
+                return Response.status(Response.Status.FORBIDDEN)
+                        .build();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .build();
+        }
+    }
+    //Get appointment detail : Admin can view any appointment detail. User can only view theirs.
+    @GET
+    @Path("{appointmentId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAppointmentDetail(@HeaderParam("x-api-key") String token, @HeaderParam("username") String username, @HeaderParam("email") String email, @PathParam("appointmentId") int appointmentId) {
+        try {
+            Appointment appointment = appointmentManager.getAppointment(appointmentId);
+            if(adminManager.validateToken(username, token) || (userManager.validateToken(email, token) && appointment.getEmail().equals(email))) {
+
+                return Response.status(Response.Status.OK)
+                        .entity(appointment)
+                        .build();
+            }
+            else{
+                return Response.status(Response.Status.FORBIDDEN)
+                        .build();
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
