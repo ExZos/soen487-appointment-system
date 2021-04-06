@@ -1,58 +1,115 @@
 import {useEffect, useRef, useState} from 'react';
-
-import {api, server} from '../../endpoints/server';
-import {CircularProgress} from '@material-ui/core';
-import {useLocation} from 'react-router';
+import {useHistory, useLocation} from 'react-router';
+import {CircularProgress, makeStyles} from '@material-ui/core';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
+
+import {api, server} from '../../endpoints/server';
+import {dateFormatter} from '../../utilities/dateUtils';
 
 // USED FOR TEMPORARY HARDCODING
 const appts = [
     {
-        id: 1
+        appointmentId: 1,
+        date: '2021-03-13',
+        status: 'OPEN'
     }, {
-        id: 2
+        appointmentId: 2,
+        date: '2021-03-21',
+        status: 'CLOSED'
     }, {
-        id: 3
+        appointmentId: 3,
+        date: '2021-03-29',
+        status: 'OPEN'
     }
 ];
 
+const useStyles = makeStyles({
+    apptCalendar: {
+        margin: 'auto'
+    }
+});
+
 function AdminAppointmentList(props) {
+    const classes = useStyles();
+
     const location = useLocation();
+    const history = useHistory();
 
     const [appointments, setAppointments] = useState([]);
+    const apptDict = useRef({});
     const [isLoaded, setIsLoaded] = useState(false);
 
-    const resource = useRef(JSON.parse(location.state.resource));
-    const currentDate = new Date();
+    const resource = useRef(JSON.parse(location.state?.resource));
+    const minDate = useRef(new Date());
+    const maxDate = useRef(new Date());
 
     useEffect(() => {
+        if(!location.state)
+            history.push('/admin/home');
+
         const getAppointmentList = () => {
             server.get(api.listResourceAppointments)
-                .then(res => setAppointments(res.data))
-                .catch(() => setAppointments(appts)) // TEMPORARY HARDCODING
+                .then(res => {
+                    setAppointments(res.data);
+                    apptDict.current = res.data.reduce((a,x) => ({...a, [x.date]: x.appointmentId}), {});
+                })
+                .catch(() => {
+                    setAppointments(appts);
+                    apptDict.current = appts.reduce((a,x) => ({...a, [x.date]: x.appointmentId}), {});
+                }) // TEMPORARY HARDCODING
                 .finally(() => setIsLoaded(true));
         };
 
+        minDate.current.setDate(minDate.current.getDate() + 1);
+        maxDate.current.setDate(maxDate.current.getDate() + 31);
+
         getAppointmentList();
     }, [])
+
+    const redirectAppointmentDetails = (date) => {
+        // TODO: move this and mark calendar tiles
+        // const bookedDates = appointments
+        //     .filter(a => a.status === 'CLOSED')
+        //     .map(a => a.date);
+        // console.log(bookedDates);
+
+        const appointmentId = apptDict.current[dateFormatter.hyphenatedYearMonthDay(date)];
+        if(!appointmentId) {
+            alert("No appointment on this day");
+            return;
+        }
+
+        history.push({
+            pathname: '/admin/appointment/' + appointmentId
+        });
+    };
+
+    const disableCalendarWeekends = (date) => {
+        // Disable weekends
+        const day = date.date.getDay();
+        if(day === 0 || day === 6)
+            return true;
+
+        // Disable days that don't have appointments
+        const dictValue = apptDict.current[dateFormatter.hyphenatedYearMonthDay(date.date)];
+        return !Boolean(dictValue);
+    };
 
     const renderAppointmentList = () => {
         if(!isLoaded)
             return <CircularProgress />;
         else if(!appointments)
             return "An error occurred while getting the appointments";
-        else if(appointments.length === 0)
-            return "There are no appointments";
-
-        const minDate = new Date();
-        minDate.setDate(currentDate.getDate() + 1);
-
-        const maxDate = new Date();
-        maxDate.setDate(currentDate.getDate() + 30)
 
         return (
-            <Calendar minDate={minDate} maxDate={maxDate} />
+            <Calendar
+                className={classes.apptCalendar}
+                calendarType="US"
+                minDate={minDate.current} maxDate={maxDate.current}
+                tileDisabled={(date) => disableCalendarWeekends(date)}
+                onClickDay={(date) => redirectAppointmentDetails(date)}
+            />
         );
     };
 
