@@ -145,17 +145,12 @@ public class AppointmentRest {
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("{userId}")
-    public Response getUserAppointments(@HeaderParam("x-api-key") String token, @HeaderParam("email") String email,@HeaderParam("username") String username, @PathParam("userId") int userId) {
+    @Path("user/{userId}")
+    public Response getUserAppointments(@HeaderParam("x-api-key") String token, @HeaderParam("email") String email, @PathParam("userId") int userId) {
         try {
             User user = userManager.getUserByEmail(email);
-            boolean userValid = false;
-            if(userManager.validateToken(email, token) && user.getUserId() == userId)
-            {
-                userValid = true;
-            }
 
-            if(userValid || adminManager.validateToken(username, token))
+            if(userManager.validateToken(email, token) && user.getUserId() == userId)
             {
                 List<Appointment> appointments = appointmentManager.getUserAppointments(userId);
                 GenericEntity<List<Appointment>> entity = new GenericEntity<List<Appointment>>(appointments) {};
@@ -233,6 +228,52 @@ public class AppointmentRest {
                         .entity(entity)
                         .build();
             } else {
+                return Response.status(Response.Status.FORBIDDEN)
+                        .build();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .build();
+        }
+    }
+    @GET
+    @Path("resourceAppointments/open/{resourceId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getOpenResourceAppointments(@HeaderParam("x-api-key") String token, @HeaderParam("email") String email, @PathParam("resourceId") int resourceId) {
+        try {
+            if (userManager.validateToken(email, token)) {
+                List<Appointment> appointments = appointmentManager.getOpenResourceAppointments(resourceId);
+                GenericEntity<List<Appointment>> entity = new GenericEntity<List<Appointment>>(appointments) {
+                };
+
+                return Response.status(Response.Status.OK)
+                        .entity(entity)
+                        .build();
+            } else {
+                return Response.status(Response.Status.FORBIDDEN)
+                        .build();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .build();
+        }
+    }
+    //Get appointment detail
+    @GET
+    @Path("{appointmentId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAppointmentDetail(@HeaderParam("x-api-key") String token, @HeaderParam("username") String username, @PathParam("appointmentId") int appointmentId) {
+        try {
+            if(adminManager.validateToken(username, token)) {
+                Appointment appointment = appointmentManager.getAppointment(appointmentId);
+
+                return Response.status(Response.Status.OK)
+                        .entity(appointment)
+                        .build();
+            }
+            else{
                 return Response.status(Response.Status.FORBIDDEN)
                         .build();
             }

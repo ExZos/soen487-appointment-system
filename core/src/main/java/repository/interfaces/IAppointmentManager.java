@@ -18,5 +18,6 @@ public interface IAppointmentManager extends IManager{
     ArrayList<Appointment> getResourceAppointments(int id) throws SQLException;
     ArrayList<Appointment> getAppointments() throws SQLException;
     ArrayList<Appointment> getOpenAppointments() throws SQLException;
+    ArrayList<Appointment> getOpenResourceAppointments(int resourceId) throws SQLException;
     void createResourceAppointments(int resourceId) throws SQLException;
 }

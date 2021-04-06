@@ -133,6 +133,23 @@ public class AppointmentDAO {
 
         return appointments;
     }
+    public static ArrayList<Appointment> getOpenResourceAppointments(int resourceId) throws SQLException {
+        ArrayList<Appointment> appointments = new ArrayList<>();
+
+        String status = "OPEN";
+
+        Connection conn = DBConnection.getConnection();
+        String sql = "SELECT * FROM Appointment WHERE resourceId = ? AND status = ?";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setInt(1, resourceId);
+        stmt.setString(2, status);
+
+        ResultSet rs = stmt.executeQuery();
+        while(rs.next())
+            appointments.add(mapResultSetToAppointment(rs));
+
+        return appointments;
+    }
     private static Appointment mapResultSetToAppointment(ResultSet rs) throws SQLException {
         Appointment appointment = new Appointment();
         appointment.setAppointmentId(rs.getInt("id"));
