@@ -147,13 +147,13 @@ public class AppointmentRest {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("user/{userId}")
-    public Response getUserAppointments(@HeaderParam("x-api-key") String token, @HeaderParam("email") String email, @PathParam("userId") int userId) {
+    public Response getUserAppointments(@HeaderParam("x-api-key") String token, @HeaderParam("email") String email) {
         try {
             User user = userManager.getUserByEmail(email);
 
-            if(userManager.validateToken(email, token) && user.getUserId() == userId)
+            if(userManager.validateToken(email, token))
             {
-                List<Appointment> appointments = appointmentManager.getUserAppointments(userId);
+                List<Appointment> appointments = appointmentManager.getUserAppointments(user.getUserId());
                 GenericEntity<List<Appointment>> entity = new GenericEntity<List<Appointment>>(appointments) {};
                 return Response.status(Response.Status.OK)
                         .entity(entity)
@@ -248,9 +248,8 @@ public class AppointmentRest {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAppointmentDetail(@HeaderParam("x-api-key") String token, @HeaderParam("username") String username, @HeaderParam("email") String email, @PathParam("appointmentId") int appointmentId) {
         try {
-            User user = userManager.getUserByEmail(email);
             Appointment appointment = appointmentManager.getAppointment(appointmentId);
-            if(adminManager.validateToken(username, token) || appointment.getEmail().equals(user.getEmail())) {
+            if(adminManager.validateToken(username, token) || (userManager.validateToken(email, token) && appointment.getEmail().equals(email))) {
 
                 return Response.status(Response.Status.OK)
                         .entity(appointment)
