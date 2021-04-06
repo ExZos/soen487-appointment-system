@@ -2,6 +2,8 @@ package database.dao;
 
 import database.db.DBConnection;
 import repository.pojos.Appointment;
+import repository.pojos.Resource;
+import repository.pojos.User;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -17,6 +19,35 @@ public class AppointmentDAO {
         String sql = "SELECT * FROM Appointment WHERE resourceId = ?";
         PreparedStatement stmt = conn.prepareStatement(sql);
         stmt.setInt(1, id);
+        ResultSet rs = stmt.executeQuery();
+
+        while(rs.next())
+            appointments.add(mapResultSetToAppointment(rs));
+
+        return appointments;
+    }
+    public static ArrayList<Appointment> getAppointments() throws SQLException {
+        ArrayList<Appointment> appointments = new ArrayList<>();
+
+        Connection conn = DBConnection.getConnection();
+
+        String sql = "SELECT * FROM Appointment";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        ResultSet rs = stmt.executeQuery();
+
+        while(rs.next())
+            appointments.add(mapResultSetToAppointment(rs));
+
+        return appointments;
+    }
+    public static ArrayList<Appointment> getOpenAppointments() throws SQLException {
+        ArrayList<Appointment> appointments = new ArrayList<>();
+
+        Connection conn = DBConnection.getConnection();
+        String status = "OPEN";
+        String sql = "SELECT * FROM Appointment WHERE STATUS = ?";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setString(1, status);
         ResultSet rs = stmt.executeQuery();
 
         while(rs.next())
@@ -104,14 +135,36 @@ public class AppointmentDAO {
 
         return appointments;
     }
+    public static ArrayList<Appointment> getOpenResourceAppointments(int resourceId) throws SQLException {
+        ArrayList<Appointment> appointments = new ArrayList<>();
+
+        String status = "OPEN";
+
+        Connection conn = DBConnection.getConnection();
+        String sql = "SELECT * FROM Appointment WHERE resourceId = ? AND status = ?";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setInt(1, resourceId);
+        stmt.setString(2, status);
+
+        ResultSet rs = stmt.executeQuery();
+        while(rs.next())
+            appointments.add(mapResultSetToAppointment(rs));
+
+        return appointments;
+    }
     private static Appointment mapResultSetToAppointment(ResultSet rs) throws SQLException {
         Appointment appointment = new Appointment();
         appointment.setAppointmentId(rs.getInt("id"));
-        appointment.setResourceId(rs.getInt("resourceId"));
-        appointment.setUserId(rs.getInt("userId"));
+        int resourceId = rs.getInt("resourceId");
+        appointment.setResourceId(resourceId);
+        int userId = rs.getInt("userId");
+        appointment.setUserId(userId);
         appointment.setDate(rs.getDate("appointmentDate").toLocalDate());
         appointment.setMessage(rs.getString("message"));
         String status = rs.getString("status");
+
+        Resource resource = ResourceDAO.getResourceById(resourceId);
+        appointment.setResourceName(resource.getName());
 
         if(status.equals("OPEN"))
         {
@@ -120,6 +173,11 @@ public class AppointmentDAO {
         else
         {
             appointment.setStatus(Appointment.Status.CLOSED);
+        }
+
+        if(userId != 0){
+            User user = UserDAO.selectUserById(userId);
+            appointment.setEmail(user.getEmail());
         }
 
         return appointment;
