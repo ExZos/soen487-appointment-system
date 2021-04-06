@@ -2,6 +2,7 @@ package database.dao;
 
 import database.db.DBConnection;
 import repository.pojos.Appointment;
+import repository.pojos.Resource;
 import repository.pojos.User;
 
 import java.sql.*;
@@ -154,12 +155,16 @@ public class AppointmentDAO {
     private static Appointment mapResultSetToAppointment(ResultSet rs) throws SQLException {
         Appointment appointment = new Appointment();
         appointment.setAppointmentId(rs.getInt("id"));
-        appointment.setResourceId(rs.getInt("resourceId"));
+        int resourceId = rs.getInt("resourceId");
+        appointment.setResourceId(resourceId);
         int userId = rs.getInt("userId");
         appointment.setUserId(userId);
         appointment.setDate(rs.getDate("appointmentDate").toLocalDate());
         appointment.setMessage(rs.getString("message"));
         String status = rs.getString("status");
+
+        Resource resource = ResourceDAO.getResourceById(resourceId);
+        appointment.setResourceName(resource.getName());
 
         if(status.equals("OPEN"))
         {
@@ -169,6 +174,7 @@ public class AppointmentDAO {
         {
             appointment.setStatus(Appointment.Status.CLOSED);
         }
+
         if(userId != 0){
             User user = UserDAO.selectUserById(userId);
             appointment.setEmail(user.getEmail());
