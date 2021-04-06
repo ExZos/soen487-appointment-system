@@ -26,7 +26,7 @@ export const dayString = {
 export const dateFormatter = {
     hyphenatedYearMonthDay: function(date: Date) {
         const year = date.getFullYear();
-        const month = prependZeroToDigit(date.getMonth());
+        const month = prependZeroToDigit(date.getMonth() + 1);
         const dayOfMonth = prependZeroToDigit(date.getDate());
 
         return year + '-' + month + '-' + dayOfMonth;

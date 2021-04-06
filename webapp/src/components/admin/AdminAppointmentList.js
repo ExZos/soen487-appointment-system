@@ -7,23 +7,6 @@ import 'react-calendar/dist/Calendar.css';
 import {api, server} from '../../endpoints/server';
 import {dateFormatter} from '../../utilities/dateUtils';
 
-// USED FOR TEMPORARY HARDCODING
-const appts = [
-    {
-        appointmentId: 1,
-        date: '2021-03-13',
-        status: 'OPEN'
-    }, {
-        appointmentId: 2,
-        date: '2021-03-21',
-        status: 'CLOSED'
-    }, {
-        appointmentId: 3,
-        date: '2021-03-29',
-        status: 'OPEN'
-    }
-];
-
 const useStyles = makeStyles({
     apptCalendar: {
         margin: 'auto'
@@ -49,15 +32,20 @@ function AdminAppointmentList(props) {
             history.push('/admin/home');
 
         const getAppointmentList = () => {
-            server.get(api.listResourceAppointments)
+            const config = {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'username': props.user.username,
+                    'x-api-key': props.user.token
+                }
+            }
+
+            server.get(api.listResourceAppointments + '/' + resource.current.resourceId, config)
                 .then(res => {
                     setAppointments(res.data);
                     apptDict.current = res.data.reduce((a,x) => ({...a, [x.date]: x.appointmentId}), {});
                 })
-                .catch(() => {
-                    setAppointments(appts);
-                    apptDict.current = appts.reduce((a,x) => ({...a, [x.date]: x.appointmentId}), {});
-                }) // TEMPORARY HARDCODING
+                .catch(() => setAppointments(null)) // TEMPORARY HARDCODING
                 .finally(() => setIsLoaded(true));
         };
 
@@ -65,7 +53,7 @@ function AdminAppointmentList(props) {
         maxDate.current.setDate(maxDate.current.getDate() + 31);
 
         getAppointmentList();
-    }, [])
+    }, [history, location.state, props.user])
 
     const redirectAppointmentDetails = (date) => {
         // TODO: move this and mark calendar tiles
@@ -91,7 +79,7 @@ function AdminAppointmentList(props) {
         if(day === 0 || day === 6)
             return true;
 
-        // Disable days that don't have appointments
+        // Disable days that don't have appointment
         const dictValue = apptDict.current[dateFormatter.hyphenatedYearMonthDay(date.date)];
         return !Boolean(dictValue);
     };

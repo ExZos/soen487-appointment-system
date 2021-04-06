@@ -14,15 +14,6 @@ import {
 import {api, server} from '../../endpoints/server';
 import {dateFormatter} from '../../utilities/dateUtils';
 
-const appt = {
-    appointmentId: 9000,
-    resourceName: 'Meeting Room #5',
-    email: 'qwerty@gmail.com',
-    date: '2021-03-17',
-    status: 'CLOSED',
-    message: 'QWERTYqwertyQWERTY'
-};
-
 const CustomPaper = withStyles({
     root: {
         width: 'fit-content',
@@ -45,14 +36,22 @@ function AppointmentDetails(props) {
 
     useEffect(() => {
         const getAppointmentDetails = () => {
-            server.get(api.getAppointmentDetails + params.id)
+            const config = {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'username': props.user.username,
+                    'x-api-key': props.user.token
+                }
+            }
+
+            server.get(api.getAppointmentDetails + '/' + params.id, config)
                 .then(res => setAppointment(res.data))
-                .catch(() => setAppointment(appt))
+                .catch(() => setAppointment(null))
                 .finally(() => setIsLoaded(true));
         };
 
         getAppointmentDetails();
-    }, []);
+    }, [props.user, params.id]);
 
     const renderAppointmentDetails = () => {
         if(!isLoaded)
@@ -80,6 +79,11 @@ function AppointmentDetails(props) {
                               <TableCell align="right"><b>Date</b></TableCell>
                               <TableCell align="left">{dateFormatter.prettyString(new Date(appointment.date))}</TableCell>
                           </TableRow>
+
+                          <TableRow>
+                              <TableCell align="right"><b>Status</b></TableCell>
+                              <TableCell align="left">{appointment.status}</TableCell>
+                          </TableRow>
                       </TableBody>
 
                       <CustomTableHead>
@@ -91,12 +95,12 @@ function AppointmentDetails(props) {
                       <TableBody>
                           <TableRow>
                               <TableCell align="right"><b>Email</b></TableCell>
-                              <TableCell align="left">{appointment.email}</TableCell>
+                              <TableCell align="left">{appointment.email ? appointment.email : 'N/A'}</TableCell>
                           </TableRow>
 
                           <TableRow>
                               <TableCell align="right"><b>Message</b></TableCell>
-                              <TableCell align="left">{appointment.message}</TableCell>
+                              <TableCell align="left">{appointment.message ? appointment.message : 'N/A'}</TableCell>
                           </TableRow>
                       </TableBody>
                   </Table>

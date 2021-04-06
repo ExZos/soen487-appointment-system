@@ -23,6 +23,6 @@ export const api = {
     addResource: '/resource/create',
 
     // Appointment
-    listResourceAppointments: '',
-    getAppointmentDetails : ''
+    listResourceAppointments: '/appointment/resourceAppointments',
+    getAppointmentDetails : '/appointment'
 };
