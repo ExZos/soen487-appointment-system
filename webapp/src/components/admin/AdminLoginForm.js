@@ -72,15 +72,11 @@ function AdminLoginForm() {
             <LoginCard raised>
                 <CardHeader title="Admin Login" className="pb-0" />
                 <CardContent>
-                    <div className="mb-3">
-                        <FormControl>
-                            <TextField size="small" label="Username" value={username} error={usernameError !== ''} helperText={usernameError}
-                                       onChange={(e) => setUsername(e.currentTarget.value)} />
-                        </FormControl>
-                    </div>
-
                     <div className="mb-4">
                         <FormControl>
+                            <TextField className="mb-2" size="small" label="Username" value={username} error={usernameError !== ''} helperText={usernameError}
+                                       onChange={(e) => setUsername(e.currentTarget.value)} />
+
                             <TextField size="small" type="password" label="Password" value={password} error={passwordError !== ''} helperText={passwordError}
                                        onChange={(e) => setPassword(e.currentTarget.value)} />
                         </FormControl>

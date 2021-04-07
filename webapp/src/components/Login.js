@@ -1,6 +1,6 @@
 import {useEffect, useRef} from 'react';
 import {useHistory, useLocation} from 'react-router';
-import {Button, Card, CardContent, CardHeader, CircularProgress, withStyles} from '@material-ui/core';
+import {Button, Card, CardContent, CardHeader, CircularProgress, FormControl, withStyles} from '@material-ui/core';
 
 import {server, api} from '../endpoints/server';
 import {setSession} from '../utilities/sessionUtils';
@@ -44,13 +44,13 @@ function Login() {
 
     }, [history, location]);
 
-    const userLogin = () => {
+    const userLoginRedirect = () => {
         server.get(api.userLogin + '?isWebOrigin=true')
             .then(res => window.location.assign(res.data))
             .catch(err => console.log(err));
     };
 
-    const adminLogin = () => {
+    const adminLoginRedirect = () => {
         history.push('/admin/login');
     };
 
@@ -67,17 +67,15 @@ function Login() {
           <LoginCard raised>
               <CardHeader title="Login" />
               <CardContent>
-                  <div>
-                      <Button fullWidth variant="contained" color="primary" onClick={userLogin}>
+                  <FormControl>
+                      <Button fullWidth variant="contained" color="primary" onClick={userLoginRedirect}>
                           Login as a Client
                       </Button>
-                  </div>
 
-                  <div>
-                      <Button fullWidth variant="contained" onClick={adminLogin}>
+                      <Button fullWidth variant="contained" onClick={adminLoginRedirect}>
                           Login as an Admin
                       </Button>
-                  </div>
+                  </FormControl>
               </CardContent>
           </LoginCard>
       </div>
