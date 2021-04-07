@@ -10,7 +10,11 @@ import AdminRoute from './components/authentication/AdminRoute';
 import ClientRoute from './components/authentication/ClientRoute';
 import Login from './components/Login';
 import AdminLoginForm from './components/admin/AdminLoginForm';
+import AdminHome from './components/admin/AdminHome';
 import Home from './components/Home';
+import AdminAppointmentList from './components/admin/AdminAppointmentList';
+import AppointmentDetails from './components/admin/AppointmentDetails';
+import AddResourceForm from './components/admin/AddResourceForm';
 
 const history = createBrowserHistory();
 
@@ -18,8 +22,11 @@ const routing = (
     <React.StrictMode>
         <Router history={history}>
             <Switch>
-                <AdminRoute path="/admin/home" component={Home} />
+                <AdminRoute path="/admin/resource/add" component={AddResourceForm} />
+                <AdminRoute path="/admin/appointment/:id" component={AppointmentDetails} />
+                <AdminRoute path="/admin/appointment" stateRequired component={AdminAppointmentList} />
                 <Route path="/admin/login" component={AdminLoginForm} />
+                <AdminRoute path="/admin" component={AdminHome} />
                 <ClientRoute path="/home" component={Home} />
                 <Route path="/" component={Login} />
             </Switch>
