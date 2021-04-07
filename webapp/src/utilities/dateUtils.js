@@ -41,6 +41,16 @@ export const dateFormatter = {
     }
 };
 
+export const dateConverter = {
+    // For some reason, when converting a hyphenated date string to a Date using new Date(),
+    //  timezone differences are taken into account (and can skew date values by a day).
+    // This is not the case when using backslashed date strings, so that's why we replace first
+    fromSQLDateString: function(str: string) {
+        const backslashedStr = str.replace('-', '/');
+        return new Date(backslashedStr);
+    }
+};
+
 function prependZeroToDigit(digit: number) {
     return digit < 10 ? '0' + digit : digit;
 }

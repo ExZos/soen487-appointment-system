@@ -12,6 +12,19 @@ import BackNav from '../subcomponents/BackNav';
 const useStyles = makeStyles({
     apptCalendar: {
         margin: 'auto'
+    },
+    openAppt: {
+        backgroundColor: '#FFFFFF',
+        '&:hover': {
+            backgroundColor: '#E6E6E6 !important' // Needed bc react-calendar has universal hover that overrides
+        }
+    },
+    closedAppt: {
+        backgroundColor: '#3F51B5',
+        color: '#FFFFFF',
+        '&:hover': {
+            backgroundColor: '#7885CB !important' // Needed bc react-calendar has universal hover that overrides
+        }
     }
 });
 
@@ -45,9 +58,12 @@ function AdminAppointmentList(props) {
             server.get(api.listResourceAppointments + '/' + resource.current.resourceId, config)
                 .then(res => {
                     setAppointments(res.data);
-                    apptDict.current = res.data.reduce((a,x) => ({...a, [x.date]: x.appointmentId}), {});
+                    apptDict.current = res.data.reduce((a,x) => ({...a, [x.date]: {
+                        id: x.appointmentId,
+                        status: x.status
+                    }}), {});
                 })
-                .catch(() => setAppointments(null)) // TEMPORARY HARDCODING
+                .catch(() => setAppointments(null))
                 .finally(() => setIsLoaded(true));
         };
 
@@ -58,27 +74,32 @@ function AdminAppointmentList(props) {
     }, [history, location.state, props.user])
 
     const redirectAppointmentDetails = (date) => {
-        // TODO: move this and mark calendar tiles
-        // const bookedDates = appointments
-        //     .filter(a => a.status === 'CLOSED')
-        //     .map(a => a.date);
-        // console.log(bookedDates);
-
-        const appointmentId = apptDict.current[dateFormatter.hyphenatedYearMonthDay(date)];
-        if(!appointmentId) {
+        const appointment = apptDict.current[dateFormatter.hyphenatedYearMonthDay(date)];
+        if(!appointment) {
             alert("No appointment on this day");
             return;
         }
 
         history.push({
-            pathname: '/admin/appointment/' + appointmentId
+            pathname: '/admin/appointment/' + appointment.id
         });
     };
 
     const disableCalendarDays = (date) => {
         // Disable days that don't have appointment
-        const dictValue = apptDict.current[dateFormatter.hyphenatedYearMonthDay(date.date)];
-        return !Boolean(dictValue);
+        const appointment = apptDict.current[dateFormatter.hyphenatedYearMonthDay(date.date)];
+        return !Boolean(appointment);
+    };
+
+    const markCalendarDays = (date) => {
+        const appointment = apptDict.current[dateFormatter.hyphenatedYearMonthDay(date.date)];
+
+        if(!appointment)
+            return;
+        else if(appointment.status === 'OPEN')
+            return classes.openAppt;
+
+        return classes.closedAppt;
     };
 
     const renderAppointmentList = () => {
@@ -90,9 +111,11 @@ function AdminAppointmentList(props) {
         return (
             <Calendar
                 className={classes.apptCalendar}
-                calendarType="US"
+                calendarType="US" minDetail="month"
                 minDate={minDate.current} maxDate={maxDate.current}
+                prev2Label={null} next2Label={null} activeStartDate={null}
                 tileDisabled={(date) => disableCalendarDays(date)}
+                tileClassName={(date) => markCalendarDays(date)}
                 onClickDay={(date) => redirectAppointmentDetails(date)}
             />
         );

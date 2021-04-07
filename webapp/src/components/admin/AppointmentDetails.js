@@ -12,7 +12,7 @@ import {
 } from '@material-ui/core';
 
 import {api, server} from '../../endpoints/server';
-import {dateFormatter} from '../../utilities/dateUtils';
+import {dateConverter, dateFormatter} from '../../utilities/dateUtils';
 import BackNav from '../subcomponents/BackNav';
 import Navbar from '../subcomponents/Navbar';
 
@@ -79,7 +79,9 @@ function AppointmentDetails(props) {
 
                           <TableRow>
                               <TableCell align="right"><b>Date</b></TableCell>
-                              <TableCell align="left">{dateFormatter.prettyString(new Date(appointment.date))}</TableCell>
+                              <TableCell align="left">
+                                  {dateFormatter.prettyString(dateConverter.fromSQLDateString(appointment.date))}
+                              </TableCell>
                           </TableRow>
 
                           <TableRow>
