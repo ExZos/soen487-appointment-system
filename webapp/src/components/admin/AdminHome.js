@@ -4,6 +4,8 @@ import {useHistory} from 'react-router';
 import {Button, FormControl, InputLabel, Select, withStyles} from '@material-ui/core';
 
 import {api, server} from '../../endpoints/server';
+import Navbar from '../subcomponents/Navbar';
+import LogoutButton from '../subcomponents/LogoutButton';
 
 const ResourceSelect = withStyles({
     root: {
@@ -66,27 +68,27 @@ function AdminHome(props) {
     };
 
     return (
-        <div id="adminHome" className="text-center">
-            <h3>Home</h3>
+        <React.Fragment>
+            <Navbar user={props.user} admin />
 
-            <div className="mt-3">
-                <div>View Appointments</div>
+            <div id="adminHome" className="text-center">
+                <h3>View Appointments</h3>
 
-                <FormControl variant="outlined" size="small">
-                    <InputLabel id="resource-select-label">Resource</InputLabel>
-                    <ResourceSelect label="Resource" labelId="resource-select-label" value={selectedResource}
-                            onChange={(e) => setSelectedResource(e.currentTarget.value)} native>
-                        <option disabled />
+                <div className="mt-3">
+                    <FormControl variant="outlined" size="small">
+                        <InputLabel id="resource-select-label">Resource</InputLabel>
+                        <ResourceSelect label="Resource" labelId="resource-select-label" value={selectedResource}
+                                onChange={(e) => setSelectedResource(e.currentTarget.value)} native>
+                            <option disabled />
 
-                        {renderResourceOptions()}
-                    </ResourceSelect>
-                </FormControl>
+                            {renderResourceOptions()}
+                        </ResourceSelect>
+                    </FormControl>
 
-                <Button height="50" variant="contained" color="primary" disabled={selectedResource === ""} onClick={listAppointmentsRedirect}>Go</Button>
+                    <Button height="50" variant="contained" color="primary" disabled={selectedResource === ""} onClick={listAppointmentsRedirect}>Go</Button>
+                </div>
             </div>
-
-            <Button variant="contained" className="mt-4" onClick={addResourceRedirect}>Add Resource</Button>
-        </div>
+        </React.Fragment>
     );
 }
 

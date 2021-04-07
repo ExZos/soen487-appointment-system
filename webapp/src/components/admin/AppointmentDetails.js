@@ -13,6 +13,8 @@ import {
 
 import {api, server} from '../../endpoints/server';
 import {dateFormatter} from '../../utilities/dateUtils';
+import BackNav from '../subcomponents/BackNav';
+import Navbar from '../subcomponents/Navbar';
 
 const CustomPaper = withStyles({
     root: {
@@ -110,14 +112,20 @@ function AppointmentDetails(props) {
     };
 
     return (
-        <div id="appointmentDetails" className="text-center">
-            <h3>Appointment Details</h3>
-            <div><i>#{params.id}</i></div>
+        <React.Fragment>
+            <Navbar user={props.user} admin />
 
-            <div className="mt-3">
-                {renderAppointmentDetails()}
+            <div id="appointmentDetails" className="text-center">
+                <BackNav />
+
+                <h3>Appointment Details</h3>
+                <div><i>#{params.id}</i></div>
+
+                <div className="mt-3">
+                    {renderAppointmentDetails()}
+                </div>
             </div>
-        </div>
+        </React.Fragment>
     );
 }
 

@@ -1,8 +1,9 @@
-import {useState} from 'react';
+import React, {useState} from 'react';
 import {Button, FormControl, TextField} from '@material-ui/core';
 
 import {api, server} from '../../endpoints/server';
 import {useHistory} from 'react-router';
+import Navbar from '../subcomponents/Navbar';
 
 function AddResourceForm(props) {
     const history = useHistory();
@@ -43,18 +44,22 @@ function AddResourceForm(props) {
     };
 
     return (
-        <div id="resourceForm" className="text-center">
-            <h3>Add Resource</h3>
+        <React.Fragment>
+            <Navbar user={props.user} admin />
 
-            <div className="mt-4">
-                <FormControl>
-                    <TextField variant="outlined" size="small" type="name" label="Name" value={name} error={nameError !== ''} helperText={nameError}
-                               onChange={(e) => setName(e.currentTarget.value)} />
-                </FormControl>
+            <div id="resourceForm" className="text-center">
+                <h3>Add Resource</h3>
 
-                <Button variant="contained" color="primary" onClick={() => submit(addResource)}>Add</Button>
+                <div className="mt-4">
+                    <FormControl>
+                        <TextField variant="outlined" size="small" type="name" label="Name" value={name} error={nameError !== ''} helperText={nameError}
+                                   onChange={(e) => setName(e.currentTarget.value)} />
+                    </FormControl>
+
+                    <Button variant="contained" color="primary" onClick={() => submit(addResource)}>Add</Button>
+                </div>
             </div>
-        </div>
+        </React.Fragment>
     );
 }
 

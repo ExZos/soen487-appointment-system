@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {useHistory, useLocation} from 'react-router';
 import {CircularProgress, makeStyles} from '@material-ui/core';
 import Calendar from 'react-calendar';
@@ -6,6 +6,8 @@ import 'react-calendar/dist/Calendar.css';
 
 import {api, server} from '../../endpoints/server';
 import {dateFormatter} from '../../utilities/dateUtils';
+import Navbar from '../subcomponents/Navbar';
+import BackNav from '../subcomponents/BackNav';
 
 const useStyles = makeStyles({
     apptCalendar: {
@@ -102,14 +104,20 @@ function AdminAppointmentList(props) {
     };
 
     return (
-        <div id="adminAppointmentList" className="text-center">
-            <h3>Appointments</h3>
-            <div>for <i>{resource.current.name}</i></div>
+        <React.Fragment>
+            <Navbar user={props.user} admin />
 
-            <div className="appointmentList mt-3">
-                {renderAppointmentList()}
+            <BackNav />
+
+            <div id="adminAppointmentList" className="text-center">
+                <h3>Appointments</h3>
+                <div>for <i>{resource.current.name}</i></div>
+
+                <div className="appointmentList mt-3">
+                    {renderAppointmentList()}
+                </div>
             </div>
-        </div>
+        </React.Fragment>
     );
 }
 
