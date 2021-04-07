@@ -24,7 +24,7 @@ const routing = (
             <Switch>
                 <AdminRoute path="/admin/resource/add" component={AddResourceForm} />
                 <AdminRoute path="/admin/appointment/:id" component={AppointmentDetails} />
-                <AdminRoute path="/admin/appointment" component={AdminAppointmentList} />
+                <AdminRoute path="/admin/appointment" stateRequired component={AdminAppointmentList} />
                 <Route path="/admin/login" component={AdminLoginForm} />
                 <AdminRoute path="/admin" component={AdminHome} />
                 <ClientRoute path="/home" component={Home} />

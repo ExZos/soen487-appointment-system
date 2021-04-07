@@ -148,7 +148,7 @@ function Navbar(props) {
       <div id="navbar" className={classes.navbar}>
           {renderNavLinks()}
 
-          <LogoutButton username={props.user.username} email={props.user.email} token={props.user.token} />
+          <LogoutButton user={props.user} iconOnly={windowWidth < minWidth} />
       </div>
     );
 }

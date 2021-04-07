@@ -3,6 +3,7 @@ import {useHistory} from 'react-router';
 
 import {removeSession} from '../../utilities/sessionUtils';
 import {logoutCall} from '../../utilities/authUtils';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 
 const CustomButton = withStyles({
     root: {
@@ -19,10 +20,10 @@ function LogoutButton(props) {
     const history = useHistory();
 
     const logout = () => {
-        if(props.username) // Admin
-            generalLogoutCall(logoutCall.admin, props.username, props.token);
-        else if(props.email) // Client
-            generalLogoutCall(logoutCall.client, props.email, props.token);
+        if(props.user?.username) // Admin
+            generalLogoutCall(logoutCall.admin, props.user.username, props.user.token);
+        else if(props.user?.email) // Client
+            generalLogoutCall(logoutCall.client, props.user.email, props.user.token);
     };
 
     const generalLogoutCall = (callback, identifier, token) => {
@@ -33,8 +34,15 @@ function LogoutButton(props) {
             });
     };
 
+    if(props.iconOnly)
+        return (
+            <CustomButton variant="contained" size="small" onClick={logout}>
+                <ExitToAppIcon />
+            </CustomButton>
+        );
+
     return (
-        <CustomButton variant="contained" size="small" onClick={logout}>Logout</CustomButton>
+        <CustomButton variant="contained" size="small" startIcon={<ExitToAppIcon />} onClick={logout}>Logout</CustomButton>
     );
 }
 

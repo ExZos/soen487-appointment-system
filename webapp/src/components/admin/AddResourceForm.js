@@ -1,9 +1,20 @@
 import React, {useState} from 'react';
-import {Button, FormControl, TextField} from '@material-ui/core';
+import {Button, FormControl, TextField, withStyles} from '@material-ui/core';
+import AddIcon from '@material-ui/icons/Add';
 
 import {api, server} from '../../endpoints/server';
 import {useHistory} from 'react-router';
 import Navbar from '../subcomponents/Navbar';
+
+const CustomButton = withStyles({
+    root: {
+        height: '40px',
+        borderTopLeftRadius: 0,
+        borderBottomLeftRadius: 0,
+        boxShadow: 'none',
+        left: '-2px'
+    }
+})(Button);
 
 function AddResourceForm(props) {
     const history = useHistory();
@@ -12,12 +23,16 @@ function AddResourceForm(props) {
     const [nameError, setNameError] = useState('');
 
     const submit = (callback) => {
-      if(!name || !name.trim()) {
+      if(!nameInputIsValid()) {
           setNameError('Required');
           return;
       }
 
       callback();
+    };
+
+    const nameInputIsValid = () => {
+        return name && name.trim();
     };
 
     const addResource = () => {
@@ -56,7 +71,10 @@ function AddResourceForm(props) {
                                    onChange={(e) => setName(e.currentTarget.value)} />
                     </FormControl>
 
-                    <Button variant="contained" color="primary" onClick={() => submit(addResource)}>Add</Button>
+                    <CustomButton variant="contained" color="primary" startIcon={<AddIcon />}
+                                  disabled={!nameInputIsValid()} onClick={() => submit(addResource)}>
+                        Add
+                    </CustomButton>
                 </div>
             </div>
         </React.Fragment>

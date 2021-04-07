@@ -75,12 +75,7 @@ function AdminAppointmentList(props) {
         });
     };
 
-    const disableCalendarWeekends = (date) => {
-        // Disable weekends
-        const day = date.date.getDay();
-        if(day === 0 || day === 6)
-            return true;
-
+    const disableCalendarDays = (date) => {
         // Disable days that don't have appointment
         const dictValue = apptDict.current[dateFormatter.hyphenatedYearMonthDay(date.date)];
         return !Boolean(dictValue);
@@ -97,7 +92,7 @@ function AdminAppointmentList(props) {
                 className={classes.apptCalendar}
                 calendarType="US"
                 minDate={minDate.current} maxDate={maxDate.current}
-                tileDisabled={(date) => disableCalendarWeekends(date)}
+                tileDisabled={(date) => disableCalendarDays(date)}
                 onClickDay={(date) => redirectAppointmentDetails(date)}
             />
         );
