@@ -2,15 +2,15 @@
 A general appointment system that uses the Google Calendar API.
 
 ## Overview
-1. [Requirements](#1-requirements)
-2. Installation  
-   2.1 Maven  
-   2.2. npm
-3. Configuration  
+1. [Requirements](#1-requirements)  
+2. [Installation](#2-installation)  
+   2.1 [Maven](#2-1-maven)  
+   2.2. [npm](#2-2-npm)  
+3. [Configuration](#3-configuration)  
    3.1 Database Configuration  
-   3.2 Google API Credentials Configuration
-4. Starting the Application
-5. External Libraries  
+   3.2 Google API Credentials Configuration  
+4. [Starting the Application](#4-starting-the-application)  
+5. [External Libraries](#5-external-libraries)  
    5.1 Backend Libraries  
    5.2 Frontend Libraries
 
