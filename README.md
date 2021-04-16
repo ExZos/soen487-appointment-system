@@ -2,7 +2,7 @@
 A general appointment system that uses the Google Calendar API.
 
 ## Overview
-1. Requirements
+1. [Requirements](#1-requirements)
 2. Installation  
    2.1 Maven  
    2.2. npm
