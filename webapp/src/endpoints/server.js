@@ -24,5 +24,6 @@ export const api = {
 
     // Appointment
     listResourceAppointments: '/appointment/resourceAppointments',
+    listOpenAppointments: 'resourceAppointments/open',
     getAppointmentDetails : '/appointment'
 };
