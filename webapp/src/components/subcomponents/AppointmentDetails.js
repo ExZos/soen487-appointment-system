@@ -43,6 +43,24 @@ function AppointmentDetails(props) {
     });
 
     const deleteAppointment = () => {
+        const config = {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'email': props.user.email,
+                'x-api-key': props.user.token
+            }
+        }
+
+        server.delete(api.deleteAppointment + "/" + appointment.appointmentId, config)
+            .then(res => {
+                console.log("SUCCESS");
+
+                if (props.onDeleteAppointmentCallBack)
+                    props.onDeleteAppointmentCallBack(appointment.appointmentId);
+            })
+            .catch(() => {
+                console.log("ERROR");
+            });
     }
 
     const updateAppointment = () => {

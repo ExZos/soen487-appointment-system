@@ -58,12 +58,6 @@ function ResourceList(props) {
         setSelectedResource(props.selectedResource);
     }, [props.selectedResource]);
 
-    const listAppointmentsRedirect = () => {
-        if (props.onSelectResourceCallBack){
-            props.onSelectResourceCallBack(selectedResource)
-        }
-    };
-
     const renderResourceOptions = () => {
         if(!isLoaded)
             return;
@@ -92,10 +86,6 @@ function ResourceList(props) {
                             {renderResourceOptions()}
                         </ResourceSelect>
                     </FormControl>
-
-                    <CustomButton variant="contained" color="primary" disabled={selectedResource === ""} onClick={listAppointmentsRedirect}>
-                        <ArrowForward />
-                    </CustomButton>
                 </div>
             </div>
         </React.Fragment>

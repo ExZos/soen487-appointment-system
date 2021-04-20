@@ -36,62 +36,63 @@ const useStyles = makeStyles({
 
 function AddAppointment(props) {
     const param = useParams();
-    console.log("Params", param);
 
     const [showConfirmation, setShowConfirmation] = useState(false);
-    const [appointmentId, setAppointmentId] = useState(false);
+    const [newAppointmentId, setNewAppointmentId] = useState(false);
     const [appointment, setAppointment] = useState(null)
     const [selectedResource, setSelectedResource] = useState('');
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
     const [appointmentDate, setAppointmentDate] = useState(null)
+    const minDate = useRef(new Date())
+    const maxDate = useRef(new Date())
 
     useEffect(() => {
-        const config = {
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'email': props.user.email,
-                'x-api-key': props.user.token
+        minDate.current.setDate(minDate.current.getDate() + 1);
+        maxDate.current.setDate(maxDate.current.getDate() + 31);
+    }, [])
+
+    useEffect(() => {
+        //Updating an existing appointment
+        if (param.id){
+            const config = {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'email': props.user.email,
+                    'x-api-key': props.user.token
+                }
             }
+    
+            server.get(api.getAppointmentDetails + "/" + param.id, config)
+                .then(res => {
+                    setAppointment(res.data);
+                    setSelectedResource(res.data.resourceId);
+                    let date = dateConverter.fromSQLDateString(res.data.date);
+                    setAppointmentDate(date);
+                    setMessage(res.data.message);
+                })
+                .catch(() => {
+                    console.log("ERROR")
+                });
         }
-
-        server.get(api.getAppointmentDetails + "/" + param.id, config)
-            .then(res => {
-                setAppointment(res.data);
-                setSelectedResource(res.data.resourceId);
-                let date = dateConverter.fromSQLDateString(res.data.date);
-                setAppointmentDate(date);
-
-                /*apptDict.current = res.data.reduce((a,x) => ({...a, [x.date]: {
-                    id: x.appointmentId,
-                    status: x.status
-                }}), {});*/
-            })
-            .catch(() => {
-                console.log("ERROR")
-            });
     }, [param.id])
-
-    useEffect(()=> {
-        renderAppointmentList();
-    }, [selectedResource]);
 
     useEffect(() => {
         setShowConfirmation(true);
-    }, [appointmentId]);
-
+    }, [newAppointmentId]);
 
     const onSelectAppointmentCallBack = (selectedAppointmentId) => {
         setShowConfirmation(true);
-        setAppointmentId(selectedAppointmentId);
+        setNewAppointmentId(selectedAppointmentId);
     }
 
     const onConfirmAppointment = () => {
-        console.log("Executing")
         const bookAppointment = () => {
             const params = new URLSearchParams();
-            params.append('appointmentId', appointmentId);
+            params.append('appointmentId', newAppointmentId);
             params.append('message', message);
+
+            console.log("Book appointment params", params)
 
             const config = {
                 headers: {
@@ -115,23 +116,37 @@ function AddAppointment(props) {
         bookAppointment();
     }
 
-    const onSelectResourceCallBack = (newSelectedResource) => {
-        setSelectedResource(newSelectedResource);
+    const onUpdateAppointment = () => {
+        const updateAppointment = () => {
+            const params = {
+                'appointmentId': appointment.appointmentId,
+                'newAppointmentId': newAppointmentId,
+                'message': message
+            }
 
-        //renderAppointmentList();
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'email': props.user.email,
+                    'x-api-key': props.user.token
+                },
+            }
+
+            server.put(api.updateAppointment, params, config)
+                .then(res => {
+                    console.log("Success");
+                })
+                .catch(() => {
+                    console.log("Error")
+                })
+        };
+
+
+        updateAppointment();
     }
 
-    const renderAppointmentList = () => {
-        /*ReactDOM.unmountComponentAtNode(document.getElementById('appointmentList'));
-
-        let element;
-        if (selectedResource == null){
-            element = (<div>Please select a resource</div>);
-        }else{
-            element = (<AppointmentList user={props.user} resourceId={selectedResource} onSelectAppointmentCallBack={onSelectAppointmentCallBack} selectedDate={appointmentDate} />);
-        }
-
-        ReactDOM.render(element, document.getElementById('appointmentList'));*/
+    const onSelectResourceCallBack = (newSelectedResource) => {
+        setSelectedResource(newSelectedResource);
     }
 
     const renderAddAppointment = () => {
@@ -140,12 +155,14 @@ function AddAppointment(props) {
                         
                     <Box mb={2}>
                         <h6>Person/facility for your appointment: </h6>
-                        <ResourceList user={props.user} onSelectResourceCallBack={onSelectResourceCallBack} />
+                        <ResourceList user={props.user} onSelectResourceCallBack={onSelectResourceCallBack} selectedResource={selectedResource} />
                     </Box>
                     
                     <Box mb={2}>
                         <h6>An appointment date: </h6>
-                        <div id="appointmentList"></div>
+                        <div id="appointmentList">
+                            <AppointmentList user={props.user} resourceId={selectedResource} onSelectAppointmentCallBack={onSelectAppointmentCallBack} selectedDate={appointmentDate} selectedDate={appointmentDate} minDate={minDate.current} maxDate={maxDate.current} />
+                        </div>
                     </Box>
 
                     <Box mb={2}>
@@ -171,7 +188,7 @@ function AddAppointment(props) {
                         
                     <Box mb={2}>
                         <h6>Person/facility for your appointment: </h6>
-                        <ResourceList user={props.user} onSelectResourceCallBack={onSelectResourceCallBack} selectedResource={appointment.resourceId}/>
+                        <ResourceList user={props.user} onSelectResourceCallBack={onSelectResourceCallBack} selectedResource={selectedResource}/>
                     </Box>
                     
                     <Box mb={2}>
@@ -179,7 +196,7 @@ function AddAppointment(props) {
                         <div id="appointmentList"></div>
                     </Box>
 
-                    <AppointmentList user={props.user} resourceId={selectedResource} onSelectAppointmentCallBack={onSelectAppointmentCallBack} selectedDate={appointmentDate} />
+                    <AppointmentList user={props.user} resourceId={selectedResource} onSelectAppointmentCallBack={onSelectAppointmentCallBack} selectedDate={appointmentDate} minDate={minDate.current} maxDate={maxDate.current}/>
 
                     <Box mb={2}>
                         <h6>Message for us (optional):</h6>
@@ -198,11 +215,39 @@ function AddAppointment(props) {
     }
 
     const renderAppointmentForm = () => {
-        if (appointment != null)
-            return renderUpdateAppointment();
-        else
-            return renderAddAppointment();
+        return <div>
+                    <h3>{param.id ? "Update Appointment" : "Add Appointment"}</h3>
+                        
+                    <Box mb={2}>
+                        <h6>Person/facility for your appointment: </h6>
+                        <ResourceList user={props.user} onSelectResourceCallBack={onSelectResourceCallBack} selectedResource={selectedResource} />
+                    </Box>
+                    
+                    <Box mb={2}>
+                        <h6>Appointment date: </h6>
+                        <div id="appointmentList">
+                        <AppointmentList user={props.user} resourceId={selectedResource} onSelectAppointmentCallBack={onSelectAppointmentCallBack} selectedDate={appointmentDate} selectedDate={appointmentDate} minDate={minDate.current} maxDate={maxDate.current} />
+                        </div>
+                    </Box>
+
+                    <Box mb={2}>
+                        <h6>Message for us (optional):</h6>
+                        <div id="message">
+                            <TextField variant="outlined" size="medium" multiline={true}  type="message" label="Message" value={message} error={message !== ''} helperText={error}
+                                onChange={(e) => setMessage(e.currentTarget.value)} />
+                        </div>
+                    </Box>
+                    
+                    <Box mb={2}>
+                        <div style={{display: showConfirmation ? "block" : "none"}}>
+                            <Button variant="contained" color="primary" onClick={onConfirmAppointment} style={{display: param.id ? "none" : "" }}>Book appointment</Button>
+                            <Button variant="contained" color="primary" onClick={onUpdateAppointment} style={{display: param.id ? "" : "none" }}>Update appointment</Button>
+                        </div>
+                    </Box>
+                </div>
+
     }
+    
 
     return (
         <React.Fragment>

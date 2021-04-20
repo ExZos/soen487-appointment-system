@@ -2,6 +2,8 @@ package com.example.rest;
 
 import com.github.scribejava.core.model.OAuth2AccessToken;
 import factories.ManagerFactory;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import repository.interfaces.*;
 import repository.pojos.Appointment;
 import repository.pojos.Resource;
@@ -11,6 +13,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -63,11 +67,10 @@ public class AppointmentRest {
     }
 
     //Customer can cancel their own appointment
-    @POST
+    @DELETE
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("cancel")
-    public Response cancel(@HeaderParam("x-api-key") String token, @HeaderParam("email") String email, @FormParam("appointmentId") int appointmentId) {
+    @Path("/{appointmentId}")
+    public Response cancel(@HeaderParam("x-api-key") String token, @HeaderParam("email") String email, @PathParam("appointmentId") int appointmentId) {
         try {
             Appointment appointment = appointmentManager.getAppointment(appointmentId);
             User user = userManager.getUserByEmail(email);
@@ -97,12 +100,21 @@ public class AppointmentRest {
                     .build();
         }
     }
-    @POST
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("update")
-    public Response update(@HeaderParam("x-api-key") String token, @HeaderParam("email") String email, @FormParam("appointmentId") int appointmentId, @FormParam("newAppointmentId") int newAppointmentId, @FormParam("message") String message) {
+    @Path("/")
+    public Response update(@HeaderParam("x-api-key") String token, @HeaderParam("email") String email, String data) {
         try {
+            JSONParser parser = new JSONParser();
+            JSONObject jsonObject = (JSONObject) parser.parse(data);
+            System.out.println(jsonObject);
+
+            int appointmentId =  ((Long)jsonObject.get("appointmentId")).intValue();
+            int newAppointmentId = ((Long)jsonObject.get("newAppointmentId")).intValue();
+            String message = URLDecoder.decode((String) jsonObject.get("message"), StandardCharsets.UTF_8.name());
+
             Appointment appointment = appointmentManager.getAppointment(appointmentId);
             User user = userManager.getUserByEmail(email);
             if (appointment.getUserId() == user.getUserId() && userManager.validateToken(email, token)) {

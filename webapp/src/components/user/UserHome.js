@@ -37,12 +37,19 @@ function UserHome(props) {
         console.log("rendering appointments");
         let appoinmentsDetailsComponents = appointments.map(function(appointment){
             return (<Box mb={2}>
-                    <AppointmentDetails appointment={appointment} />
+                    <AppointmentDetails appointment={appointment} user={props.user} onDeleteAppointmentCallBack={onDeleteAppointmentCallBack} />
             </Box>);
           })
         return <div>
             {appoinmentsDetailsComponents}
         </div>
+    }
+
+    const onDeleteAppointmentCallBack = (deletedAppointmentId) => {
+        for(var i = 0; i < appointments.length; i++){ 
+            if (appointments[i].appointmendId == deletedAppointmentId)
+                appointments.splice(i, 1);
+        }
     }
 
 

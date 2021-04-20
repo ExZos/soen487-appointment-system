@@ -28,5 +28,6 @@ export const api = {
     getAppointmentDetails : '/appointment',
     getUserAppointments: '/appointment/user',
     bookAppointment: '/appointment/book',
-    deleteAppointment: '/appointment'
+    deleteAppointment: '/appointment',
+    updateAppointment: '/appointment'
 };
