@@ -109,31 +109,31 @@ alt token is valid
             alt appointment was booked
                 AppointmentRest <-- IAppointmentManager: Booked appointment
 
-                "Web Service Client" <-- AppointmentRest: Response
+                "Web Service Client" <-- AppointmentRest: 200 HttpResponse
 
             else appointment was not booked
                 AppointmentRest <-- IAppointmentManager: null
                 Deactivate IAppointmentManager
 
-                "Web Service Client" <-- AppointmentRest: 500 Response
+                "Web Service Client" <-- AppointmentRest: 500 HttpResponse
             end
 
         else event was not created
             AppointmentRest <-- ICalendarAPIManager: False
             Deactivate ICalendarAPIManager
 
-            "Web Service Client" <-- AppointmentRest: 500 Response
+            "Web Service Client" <-- AppointmentRest: 500 HttpResponse
          end
 
     else appointment is closed
-        "Web Service Client" <-- AppointmentRest: 401 Response
+        "Web Service Client" <-- AppointmentRest: 401 HttpResponse
     end
 
 else token is not valid
     AppointmentRest <-- IUserManager: False
     Deactivate IUserManager
 
-    "Web Service Client" <-- AppointmentRest: 401 Response
+    "Web Service Client" <-- AppointmentRest: 401 HttpResponse
     Deactivate AppointmentRest
 end
 

@@ -5,14 +5,15 @@ participant Frontend order 2
 participant Axios order 3
 participant UserRest order 4
 participant AppointmentRest order 5
-participant IUserManager order 6
-participant IAppointmentManager order 7
-participant IResourceManager order 8
-participant ICalendarAPIManager order 9
-participant UserDAO order 10
-participant AppointmentDAO order 11
-participant ResourceDAO order 12
-participant "Google Calendar Service" order 13
+participant ResourceRest order 6
+participant IUserManager order 7
+participant IAppointmentManager order 8
+participant IResourceManager order 9
+participant ICalendarAPIManager order 10
+participant UserDAO order 11
+participant AppointmentDAO order 12
+participant ResourceDAO order 13
+participant "Google Calendar Service" order 14
 
 "Real User" <- Frontend: Retrieve\nsession variables
 Activate "Real User"
@@ -38,20 +39,20 @@ IUserManager -> IUserManager: Validate token
 UserRest <-- IUserManager: boolean
 Deactivate IUserManager
 
-Axios <-- UserRest: Response
+Axios <-- UserRest: 200 HttpResponse
 Deactivate UserRest
 
 alt user is authenticated
     Frontend <-- Axios: True
     Deactivate Axios
 
-    Frontend -> Axios: Get open\nappointments
+    Frontend -> Axios: Get resources
     Activate Axios
 
-    Axios -> AppointmentRest: GET request
-    Activate AppointmentRest
+    Axios -> ResourceRest: GET request
+    Activate ResourceRest
 
-    AppointmentRest -> IUserManager: validateToken(email, token)
+    ResourceRest -> IUserManager: validateToken(email, token)
     Activate IUserManager
 
     IUserManager -> UserDAO: getUserByEmail(email)
@@ -63,41 +64,34 @@ alt user is authenticated
     IUserManager -> IUserManager: Validate token
 
     alt token is valid
-        AppointmentRest <-- IUserManager: True
-        AppointmentRest -> IAppointmentManager: getOpenResourceAppointments(resourceId)
-        Activate IAppointmentManager
+        ResourceRest <-- IUserManager: True
+        ResourceRest -> IResourceManager: getResourceList()
+        Activate IResourceManager
 
-        IAppointmentManager -> AppointmentDAO: getOpenResourceAppointments(resourceId)
-        Activate AppointmentDAO
+        IResourceManager -> ResourceDAO: getResourceList()
+        Activate ResourceDAO
 
-        IAppointmentManager <-- AppointmentDAO: Open appointments
-        Deactivate AppointmentDAO
+        IResourceManager <-- ResourceDAO: Resources
+        Deactivate ResourceDAO
 
-        AppointmentRest <-- IAppointmentManager: Open appointments
-        Deactivate IAppointmentManager
+        ResourceRest <-- IResourceManager: Resources
+        Deactivate IResourceManager
 
-        Axios <-- AppointmentRest: Response
-        Deactivate AppointmentRest
+        Axios <-- ResourceRest: 200 HttpResponse
 
-        Frontend <-- Axios: Open appointments
+        Frontend <-- Axios: Resources
         Deactivate Axios
 
-        "Real User" <- Frontend: Display open\nappointments
+        "Real User" <- Frontend: Display resources
         Deactivate Frontend
 
-        "Real User" -> "Real User": Select appointment
-
-        alt
-            "Real User" -> "Real User": Enter\noptional message
-        end
-
-        "Real User" -> Frontend: Submit
+        "Real User" -> Frontend: Select resource
         Activate Frontend
 
-        Frontend -> Axios: Book appointment
+        Frontend -> Axios: Get open\nappointments\nfor resource
         Activate Axios
 
-        Axios -> AppointmentRest: POST request
+        Axios -> AppointmentRest: GET request
         Activate AppointmentRest
 
         AppointmentRest -> IUserManager: validateToken(email, token)
@@ -113,128 +107,188 @@ alt user is authenticated
 
         alt token is valid
             AppointmentRest <-- IUserManager: True
-            AppointmentRest -> IAppointmentManager: getAppointment(appointmentId)
+            AppointmentRest -> IAppointmentManager: getOpenResourceAppointments(resourceId)
             Activate IAppointmentManager
 
-            IAppointmentManager -> AppointmentDAO: getAppointment(appointmentId)
+            IAppointmentManager -> AppointmentDAO: getOpenResourceAppointments(resourceId)
             Activate AppointmentDAO
 
-            IAppointmentManager <-- AppointmentDAO: Appointment
+            IAppointmentManager <-- AppointmentDAO: Open appointments for resource
             Deactivate AppointmentDAO
 
-            AppointmentRest <-- IAppointmentManager: Appointment
+            AppointmentRest <-- IAppointmentManager: Open appointments for resource
             Deactivate IAppointmentManager
 
-            AppointmentRest -> AppointmentRest: Check\nAppointment\nis open
+            Axios <-- AppointmentRest: 200 HttpResponse
+            Deactivate AppointmentRest
 
-            alt appointment is open
-                AppointmentRest -> IResourceManager: getResourceById(resourceId)
-                Activate IResourceManager
+            Frontend <-- Axios: Open appointments\nfor resource
+            Deactivate Axios
 
-                IResourceManager -> ResourceDAO: getResourceById(resourceId)
-                Activate ResourceDAO
+            "Real User" <- Frontend: Display open\nappointments\nfor resource
+            Deactivate Frontend
 
-                IResourceManager <-- ResourceDAO: Resource
-                Deactivate ResourceDAO
+            "Real User" -> "Real User": Select appointment
 
-                AppointmentRest <-- IResourceManager: Resource
-                Deactivate IResourceManager
+            alt
+                "Real User" -> "Real User": Enter\noptional message
+            end
 
-                AppointmentRest -> IUserManager: getUserByEmail(email)
+            "Real User" -> Frontend: Submit
+            Activate Frontend
 
-                IUserManager -> UserDAO: selectUserByEmail(email)
-                Activate UserDAO
+            Frontend -> Axios: Book appointment
+            Activate Axios
 
-                IUserManager <-- UserDAO: User
-                Deactivate UserDAO
+            Axios -> AppointmentRest: POST request
+            Activate AppointmentRest
 
-                AppointmentRest <-- IUserManager: User
-                AppointmentRest -> ICalendarAPIManager: createEventOnDate(token, resourceName, date)
-                Activate ICalendarAPIManager
+            AppointmentRest -> IUserManager: validateToken(email, token)
+            Activate IUserManager
 
-                ICalendarAPIManager -> ICalendarAPIManager: Build\nCalendar service
-                ICalendarAPIManager -> ICalendarAPIManager: Build Event
-                ICalendarAPIManager -> ICalendarAPIManager: Build Calendar\nservice request
-                ICalendarAPIManager -> "Google Calendar Service": Insert event
-                Activate "Google Calendar Service"
+            IUserManager -> UserDAO: getUserByEmail(email)
+            Activate UserDAO
 
-                ICalendarAPIManager <-- "Google Calendar Service": Event
-                Deactivate "Google Calendar Service"
+            IUserManager <-- UserDAO: User
+            Deactivate UserDAO
 
-                alt event was created
-                    AppointmentRest <-- ICalendarAPIManager: True
-                    AppointmentRest -> IAppointmentManager: book(appointmentId, userId, message)
-                    Activate IAppointmentManager
+            IUserManager -> IUserManager: Validate token
 
-                    IAppointmentManager -> AppointmentDAO: updateAppointment(appointmentId, userId, message, status)
-                    Activate AppointmentDAO
+            alt token is valid
+                AppointmentRest <-- IUserManager: True
+                AppointmentRest -> IAppointmentManager: getAppointment(appointmentId)
+                Activate IAppointmentManager
 
-                    IAppointmentManager <-- AppointmentDAO: Updated appointment id
-                    Deactivate AppointmentDAO
+                IAppointmentManager -> AppointmentDAO: getAppointment(appointmentId)
+                Activate AppointmentDAO
 
-                    IAppointmentManager -> AppointmentDAO: getAppointment(appointmentId)
-                    Activate AppointmentDAO
+                IAppointmentManager <-- AppointmentDAO: Appointment
+                Deactivate AppointmentDAO
 
-                    IAppointmentManager <-- AppointmentDAO: Appointment
-                    Deactivate AppointmentDAO
+                AppointmentRest <-- IAppointmentManager: Appointment
+                Deactivate IAppointmentManager
 
-                    alt appointment was booked
-                        AppointmentRest <-- IAppointmentManager: Booked appointment
+                AppointmentRest -> AppointmentRest: Check\nAppointment\nis open
 
-                        Axios <-- AppointmentRest: Response
+                alt appointment is open
+                    AppointmentRest -> IResourceManager: getResourceById(resourceId)
+                    Activate IResourceManager
 
-                        Frontend <-- Axios: Booked appointment
+                    IResourceManager -> ResourceDAO: getResourceById(resourceId)
+                    Activate ResourceDAO
 
-                        "Real User" <- Frontend: Display\nbooking confirmation
+                    IResourceManager <-- ResourceDAO: Resource
+                    Deactivate ResourceDAO
 
-                    else appointment was not booked
-                        AppointmentRest <-- IAppointmentManager: null
-                        Deactivate IAppointmentManager
+                    AppointmentRest <-- IResourceManager: Resource
+                    Deactivate IResourceManager
 
-                        Axios <-- AppointmentRest: 500 Response
+                    AppointmentRest -> IUserManager: getUserByEmail(email)
+
+                    IUserManager -> UserDAO: selectUserByEmail(email)
+                    Activate UserDAO
+
+                    IUserManager <-- UserDAO: User
+                    Deactivate UserDAO
+
+                    AppointmentRest <-- IUserManager: User
+                    AppointmentRest -> ICalendarAPIManager: createEventOnDate(token, resourceName, date)
+                    Activate ICalendarAPIManager
+
+                    ICalendarAPIManager -> ICalendarAPIManager: Build\nCalendar service
+                    ICalendarAPIManager -> ICalendarAPIManager: Build Event
+                    ICalendarAPIManager -> ICalendarAPIManager: Build Calendar\nservice request
+                    ICalendarAPIManager -> "Google Calendar Service": Insert event
+                    Activate "Google Calendar Service"
+
+                    ICalendarAPIManager <-- "Google Calendar Service": Event
+                    Deactivate "Google Calendar Service"
+
+                    alt event was created
+                        AppointmentRest <-- ICalendarAPIManager: True
+                        AppointmentRest -> IAppointmentManager: book(appointmentId, userId, message)
+                        Activate IAppointmentManager
+
+                        IAppointmentManager -> AppointmentDAO: updateAppointment(appointmentId, userId, message, status)
+                        Activate AppointmentDAO
+
+                        IAppointmentManager <-- AppointmentDAO: Updated appointment id
+                        Deactivate AppointmentDAO
+
+                        IAppointmentManager -> AppointmentDAO: getAppointment(appointmentId)
+                        Activate AppointmentDAO
+
+                        IAppointmentManager <-- AppointmentDAO: Appointment
+                        Deactivate AppointmentDAO
+
+                        alt appointment was booked
+                            AppointmentRest <-- IAppointmentManager: Booked appointment
+
+                            Axios <-- AppointmentRest: 200 HttpResponse
+
+                            Frontend <-- Axios: Booked appointment
+
+                            "Real User" <- Frontend: Display\nbooking confirmation
+
+                        else appointment was not booked
+                            AppointmentRest <-- IAppointmentManager: null
+                            Deactivate IAppointmentManager
+
+                            Axios <-- AppointmentRest: 500 HttpResponse
+
+                            Frontend <-- Axios: Exception
+
+                            "Real User" <-- Frontend: Display\nerror alert
+
+                        end
+
+                    else event was not created
+                        AppointmentRest <-- ICalendarAPIManager: False
+                        Deactivate ICalendarAPIManager
+
+                        Axios <-- AppointmentRest: 500 HttpResponse
 
                         Frontend <-- Axios: Exception
 
                         "Real User" <-- Frontend: Display\nerror alert
-
                     end
 
-                else event was not created
-                    AppointmentRest <-- ICalendarAPIManager: False
-                    Deactivate ICalendarAPIManager
-
-                    Axios <-- AppointmentRest: 500 Response
+                else appointment is closed
+                    Axios <-- AppointmentRest: 401 HttpResponse
 
                     Frontend <-- Axios: Exception
 
-                    "Real User" <-- Frontend: Display\nerror alert
+                    "Real User" <- Frontend: Display\nerror alert
                 end
 
-            else appointment is closed
-                Axios <-- AppointmentRest: 401 Response
+            else token is not valid
+                AppointmentRest <-- IUserManager: False
+                Deactivate IUserManager
+
+                Axios <-- AppointmentRest: 401 HttpResponse
 
                 Frontend <-- Axios: Exception
 
-                "Real User" <- Frontend: Display\nerror alert
+                "Real User" <- Frontend: Redirect to\nlogin page
             end
 
         else token is not valid
             AppointmentRest <-- IUserManager: False
             Deactivate IUserManager
 
-            Axios <-- AppointmentRest: 401 Response
+            Axios <-- AppointmentRest: 401 HttpResponse
+            Deactivate AppointmentRest
 
             Frontend <-- Axios: Exception
 
             "Real User" <- Frontend: Redirect to\nlogin page
         end
-
     else token is not valid
-        AppointmentRest <-- IUserManager: False
+        ResourceRest <-- IUserManager: False
         Deactivate IUserManager
 
-        Axios <-- AppointmentRest: 401 Response
-        Deactivate AppointmentRest
+        Axios <-- ResourceRest: 401 HttpResponse
+        Deactivate ResourceRest
 
         Frontend <-- Axios: Exception
 
