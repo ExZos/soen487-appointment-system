@@ -1,6 +1,9 @@
 import React, {useEffect, useState} from 'react';
+import {useHistory, useLocation} from 'react-router';
 import {useParams} from 'react-router';
 import {
+    Box,
+    Button,
     CircularProgress,
     Paper,
     Table,
@@ -31,35 +34,47 @@ const CustomTableHead = withStyles((theme) => ({
 
 
 function AppointmentDetails(props) {
-    const params = useParams();
-    console.log("Params ", params);
-
-    const [appointment, setAppointment] = useState(null);
-    const [isLoaded, setIsLoaded] = useState(false);
+    //const params = useParams();
+    const history = useHistory();
+    const [appointment, setAppointment] = useState(props.appointment);
 
     useEffect(() => {
-        const getAppointmentDetails = () => {
-            const config = {
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'username': props.user.username,
-                    'x-api-key': props.user.token
-                }
+        console.log(props.appointment)
+    });
+
+    const deleteAppointment = () => {
+        const config = {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'email': props.user.email,
+                'x-api-key': props.user.token
             }
+        }
 
-            server.get(api.getAppointmentDetails + '/' + params.id, config)
-                .then(res => setAppointment(res.data))
-                .catch(() => setAppointment(null))
-                .finally(() => setIsLoaded(true));
-        };
+        server.delete(api.deleteAppointment + "/" + appointment.appointmentId, config)
+            .then(res => {
+                alert("You appointment has been successfully deleted.")
 
-        getAppointmentDetails();
-    }, [props.user, params.id]);
+                if (props.onDeleteAppointmentCallBack)
+                    props.onDeleteAppointmentCallBack(appointment.appointmentId);
+            })
+            .catch((error) => {
+                if (error.response) {
+                    alert(error.response.data);
+                  }
+            });
+    }
+
+    const updateAppointment = () => {
+        history.push({
+            pathname: '/customer/appointment/' + appointment.appointmentId
+        });
+    }
 
     const renderAppointmentDetails = () => {
-        if(!isLoaded)
-            return <CircularProgress />
-        else if(!appointment)
+        console.log("Inside subcomponent");
+
+        if(!appointment)
             return "This appointment doesn't exist";
 
         return (
@@ -116,16 +131,17 @@ function AppointmentDetails(props) {
 
     return (
         <React.Fragment>
-            <Navbar user={props.user} admin />
-
             <div id="appointmentDetails" className="text-center">
-                <BackNav />
-
-                <h3>Appointment Details</h3>
-                <div><i>#{params.id}</i></div>
+                <div><i>#{appointment.appointmentId}</i></div>
 
                 <div className="mt-3">
                     {renderAppointmentDetails()}
+                </div>
+                <div>
+                <Box mt={2}>
+                    <Button variant="contained" color="primary" onClick={updateAppointment} style={{marginRight: "5px"}}>Update</Button>
+                    <Button variant="contained" color="secondary" onClick={deleteAppointment} >Delete</Button>
+                </Box>
                 </div>
             </div>
         </React.Fragment>
