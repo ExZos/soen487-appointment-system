@@ -56,16 +56,18 @@ function AppointmentList(props) {
                         id: x.appointmentId,
                         status: x.status
                     }}), {});
+                    console.log(apptDict.current);
                 })
                 .catch(() => setAppointments(null))
                 .finally(() => setIsLoaded(true));
         };
 
+
         minDate.current.setDate(minDate.current.getDate() + 1);
         maxDate.current.setDate(maxDate.current.getDate() + 31);
 
         getAppointmentList();
-    }, [history, props.resource]);
+    }, [props.resourceId]);
 
     const redirectAppointmentDetails = (date) => {
         const appointment = apptDict.current[dateFormatter.hyphenatedYearMonthDay(date)];
@@ -109,6 +111,7 @@ function AppointmentList(props) {
 
         return (
             <Calendar
+                inputRef={apptDict}
                 className={classes.apptCalendar}
                 calendarType="US" minDetail="month"
                 minDate={minDate.current} maxDate={maxDate.current}
@@ -116,7 +119,7 @@ function AppointmentList(props) {
                 tileDisabled={(date) => disableCalendarDays(date)}
                 tileClassName={(date) => markCalendarDays(date)}
                 onClickDay={(date) => redirectAppointmentDetails(date)}
-                selectedDate={props.selectedDate}
+                defaultValue={props.selectedDate}
             />
         );
     };

@@ -12,6 +12,7 @@ import Navbar from '../subcomponents/Navbar';
 import BackNav from '../subcomponents/BackNav';
 import AppointmentList from '../subcomponents/AppointmentList'
 import ResourceList from '../subcomponents/ResourceList'
+import { dateConverter } from '../../utilities/dateUtils';
 
 
 const useStyles = makeStyles({
@@ -40,9 +41,10 @@ function AddAppointment(props) {
     const [showConfirmation, setShowConfirmation] = useState(false);
     const [appointmentId, setAppointmentId] = useState(false);
     const [appointment, setAppointment] = useState(null)
-    const [selectedResource, setSelectedResource] = useState();
+    const [selectedResource, setSelectedResource] = useState('');
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
+    const [appointmentDate, setAppointmentDate] = useState(null)
 
     useEffect(() => {
         const config = {
@@ -56,13 +58,18 @@ function AddAppointment(props) {
         server.get(api.getAppointmentDetails + "/" + param.id, config)
             .then(res => {
                 setAppointment(res.data);
-                console.log(res.data);
+                setSelectedResource(res.data.resourceId);
+                let date = dateConverter.fromSQLDateString(res.data.date);
+                setAppointmentDate(date);
+
                 /*apptDict.current = res.data.reduce((a,x) => ({...a, [x.date]: {
                     id: x.appointmentId,
                     status: x.status
                 }}), {});*/
             })
-            .catch(() => {});
+            .catch(() => {
+                console.log("ERROR")
+            });
     }, [param.id])
 
     useEffect(()=> {
@@ -109,29 +116,22 @@ function AddAppointment(props) {
     }
 
     const onSelectResourceCallBack = (newSelectedResource) => {
-        console.log("onSelectResourceCallBack parent");
-        console.log("New resource", newSelectedResource);
-        console.log("Before ", selectedResource);
         setSelectedResource(newSelectedResource);
-        //selectedResource = newSelectedResource;
-        console.log("After ", selectedResource);
 
         //renderAppointmentList();
     }
 
     const renderAppointmentList = () => {
-        ReactDOM.unmountComponentAtNode(document.getElementById('appointmentList'));
+        /*ReactDOM.unmountComponentAtNode(document.getElementById('appointmentList'));
 
-        console.log("Rendering component")
-        console.log("New selected resource ", selectedResource);
         let element;
         if (selectedResource == null){
             element = (<div>Please select a resource</div>);
         }else{
-            element = (<AppointmentList user={props.user} resourceId={appointment.resourceId} onSelectAppointmentCallBack={onSelectAppointmentCallBack} selectedDate={appointment.date} />);
+            element = (<AppointmentList user={props.user} resourceId={selectedResource} onSelectAppointmentCallBack={onSelectAppointmentCallBack} selectedDate={appointmentDate} />);
         }
 
-        ReactDOM.render(element, document.getElementById('appointmentList'));
+        ReactDOM.render(element, document.getElementById('appointmentList'));*/
     }
 
     const renderAddAppointment = () => {
@@ -178,6 +178,8 @@ function AddAppointment(props) {
                         <h6>An appointment date: </h6>
                         <div id="appointmentList"></div>
                     </Box>
+
+                    <AppointmentList user={props.user} resourceId={selectedResource} onSelectAppointmentCallBack={onSelectAppointmentCallBack} selectedDate={appointmentDate} />
 
                     <Box mb={2}>
                         <h6>Message for us (optional):</h6>

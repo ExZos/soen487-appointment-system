@@ -23,12 +23,11 @@ const CustomButton = withStyles({
 })(Button);
 
 function ResourceList(props) {
-    console.log("resource id: ", props.selectedResource);
-
     const [resources, setResources] = useState([]);
     const [selectedResource, setSelectedResource] = useState(props.selectedResource);
     const [isLoaded, setIsLoaded] = useState(false);
 
+    //Initial call to get the resource list
     useEffect(() => {
         const getResourceList = () => {
             const config = {
@@ -46,6 +45,18 @@ function ResourceList(props) {
 
         getResourceList();
     }, [props.user.email, props.user.token]);
+
+    //If the control itself update the selected resource 
+    useEffect(() => {
+        if (props.onSelectResourceCallBack){
+            props.onSelectResourceCallBack(selectedResource);
+        }
+    }, [selectedResource]);
+
+    //If the value passed in by the parent change - used for inital call
+    useEffect(() => {
+        setSelectedResource(props.selectedResource);
+    }, [props.selectedResource]);
 
     const listAppointmentsRedirect = () => {
         if (props.onSelectResourceCallBack){
@@ -68,24 +79,14 @@ function ResourceList(props) {
         ));
     };
 
-    const onSelectedResourceChange = (newResourceId) => {
-        console.log("onSelectedResourceChange", newResourceId);
-        setSelectedResource(newResourceId);
-
-        if (props.onSelectResourceCallBack){
-            props.onSelectResourceCallBack(newResourceId);
-        }
-    };
-
-
     return (
         <React.Fragment>
             <div id="resource-select" className="text-center">
                 <div style={{height: '100%'}} className="mt-3">
                     <FormControl variant="outlined" size="small">
                         <InputLabel id="resource-select-label">Resource</InputLabel>
-                        <ResourceSelect label="Resource" labelId="resource-select-label" value={props.selectedResource}
-                                onChange={(e) => onSelectedResourceChange(e.currentTarget.value)} native>
+                        <ResourceSelect label="Resource" labelId="resource-select-label" value={selectedResource}
+                               onChange={(e) => setSelectedResource(e.currentTarget.value)} native>
                             <option disabled />
 
                             {renderResourceOptions()}

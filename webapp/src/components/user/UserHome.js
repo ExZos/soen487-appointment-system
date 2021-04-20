@@ -12,7 +12,6 @@ function UserHome(props) {
 
 
     useEffect(() => {
-        console.log(props);
         const config = {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
