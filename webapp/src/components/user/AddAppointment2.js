@@ -8,8 +8,8 @@ import {api, server} from '../../endpoints/server';
 import {dateFormatter} from '../../utilities/dateUtils';
 import Navbar from '../subcomponents/Navbar';
 import BackNav from '../subcomponents/BackNav';
-import AppointmentList from '../subcomponents/AppointmentList'
-
+import ResourceList from '../subcomponents/ResourceList'
+import AppointmentList from '../subcomponents/AppointmentList';
 
 const useStyles = makeStyles({
     apptCalendar: {
@@ -30,7 +30,9 @@ const useStyles = makeStyles({
     }
 });
 
-function SelectAppointmentDate(props) {
+function AddAppointment(props) {
+    const appointmentList = useRef(null);
+
     /*const classes = useStyles();
 
     const location = useLocation();
@@ -123,13 +125,18 @@ function SelectAppointmentDate(props) {
         );
     };*/
 
+    const displayAppointments = () => {
+        
+    }
+
     return (
         <React.Fragment>
             <Navbar user={props.user} customer />
+
             <BackNav />
-            <AppointmentList user={props.user}/>
+            <ResourceList user={props.user} redirectUrl="/customer/appointment/add/select-date" callback={displayAppointments}/>
         </React.Fragment>
     );
 }
 
-export default SelectAppointmentDate;
+export default AddAppointment;

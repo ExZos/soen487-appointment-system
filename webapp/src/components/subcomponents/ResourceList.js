@@ -23,14 +23,13 @@ const CustomButton = withStyles({
 })(Button);
 
 function ResourceList(props) {
-    const history = useHistory();
+    console.log("resource id: ", props.selectedResource);
 
     const [resources, setResources] = useState([]);
-    const [selectedResource, setSelectedResource] = useState('');
+    const [selectedResource, setSelectedResource] = useState(props.selectedResource);
     const [isLoaded, setIsLoaded] = useState(false);
 
     useEffect(() => {
-        console.log(props);
         const getResourceList = () => {
             const config = {
                 headers: {
@@ -46,16 +45,12 @@ function ResourceList(props) {
         };
 
         getResourceList();
-    }, [props.user.username, props.user.token]);
+    }, [props.user.email, props.user.token]);
 
     const listAppointmentsRedirect = () => {
-        if(selectedResource)
-            history.push({
-                pathname: '/customer/appointment/select-date',
-                state: {
-                    resource: selectedResource
-                }
-            });
+        if (props.onSelectResourceCallBack){
+            props.onSelectResourceCallBack(selectedResource)
+        }
     };
 
     const renderResourceOptions = () => {
@@ -67,22 +62,30 @@ function ResourceList(props) {
             return <option disabled>None</option>
 
         return resources.map((resource, i) => (
-            <option key={i} value={JSON.stringify(resource)}>
+            <option key={i} value={resource.resourceId}>
                 {resource.name}
             </option>
         ));
     };
 
+    const onSelectedResourceChange = (newResourceId) => {
+        console.log("onSelectedResourceChange", newResourceId);
+        setSelectedResource(newResourceId);
+
+        if (props.onSelectResourceCallBack){
+            props.onSelectResourceCallBack(newResourceId);
+        }
+    };
+
+
     return (
         <React.Fragment>
             <div id="resource-select" className="text-center">
-                <h3>View Appointments</h3>
-
                 <div style={{height: '100%'}} className="mt-3">
                     <FormControl variant="outlined" size="small">
                         <InputLabel id="resource-select-label">Resource</InputLabel>
-                        <ResourceSelect label="Resource" labelId="resource-select-label" value={selectedResource}
-                                onChange={(e) => setSelectedResource(e.currentTarget.value)} native>
+                        <ResourceSelect label="Resource" labelId="resource-select-label" value={props.selectedResource}
+                                onChange={(e) => onSelectedResourceChange(e.currentTarget.value)} native>
                             <option disabled />
 
                             {renderResourceOptions()}

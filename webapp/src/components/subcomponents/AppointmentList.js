@@ -30,22 +30,16 @@ const useStyles = makeStyles({
 
 function AppointmentList(props) {
     const classes = useStyles();
-
-    const location = useLocation();
     const history = useHistory();
 
     const [appointments, setAppointments] = useState([]);
     const apptDict = useRef({});
     const [isLoaded, setIsLoaded] = useState(false);
 
-    const resource = useRef(JSON.parse(location.state?.resource));
     const minDate = useRef(new Date());
     const maxDate = useRef(new Date());
 
     useEffect(() => {
-        if(!location.state)
-            history.push('/admin/home');
-
         const getAppointmentList = () => {
             const config = {
                 headers: {
@@ -55,7 +49,7 @@ function AppointmentList(props) {
                 }
             }
 
-            server.get(api.listOpenAppointments + '/' + resource.current.resourceId, config)
+            server.get(api.listOpenAppointments + '/' + props.resourceId, config)
                 .then(res => {
                     setAppointments(res.data);
                     apptDict.current = res.data.reduce((a,x) => ({...a, [x.date]: {
@@ -71,18 +65,23 @@ function AppointmentList(props) {
         maxDate.current.setDate(maxDate.current.getDate() + 31);
 
         getAppointmentList();
-    }, [history, location.state, props.user])
+    }, [history, props.resource]);
 
     const redirectAppointmentDetails = (date) => {
         const appointment = apptDict.current[dateFormatter.hyphenatedYearMonthDay(date)];
-        if(!appointment) {
+        console.log(appointment);
+
+        if (props.onSelectAppointmentCallBack){
+            props.onSelectAppointmentCallBack(appointment.id);
+        }
+        /*if(!appointment) {
             alert("No appointment on this day");
             return;
         }
 
         history.push({
             pathname: '/admin/appointment/' + appointment.id
-        });
+        });*/
     };
 
     const disableCalendarDays = (date) => {
@@ -117,6 +116,7 @@ function AppointmentList(props) {
                 tileDisabled={(date) => disableCalendarDays(date)}
                 tileClassName={(date) => markCalendarDays(date)}
                 onClickDay={(date) => redirectAppointmentDetails(date)}
+                selectedDate={props.selectedDate}
             />
         );
     };
@@ -124,9 +124,6 @@ function AppointmentList(props) {
     return (
         <React.Fragment>
             <div id="adminAppointmentList" className="text-center">
-                <h3>Appointments</h3>
-                <div>for <i>{resource.current.name}</i></div>
-
                 <div className="appointmentList mt-3">
                     {renderAppointmentList()}
                 </div>

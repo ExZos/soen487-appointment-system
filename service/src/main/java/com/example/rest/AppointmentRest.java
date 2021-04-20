@@ -61,6 +61,7 @@ public class AppointmentRest {
                     .build();
         }
     }
+
     //Customer can cancel their own appointment
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -146,7 +147,7 @@ public class AppointmentRest {
     //User can view their OWN appointments
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("user/{userId}")
+    @Path("user")
     public Response getUserAppointments(@HeaderParam("x-api-key") String token, @HeaderParam("email") String email) {
         try {
             User user = userManager.getUserByEmail(email);

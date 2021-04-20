@@ -16,7 +16,6 @@ import AdminAppointmentList from './components/admin/AdminAppointmentList';
 import AppointmentDetails from './components/admin/AppointmentDetails';
 import AddResourceForm from './components/admin/AddResourceForm';
 import AddAppointment from './components/user/AddAppointment';
-import SelectAppointmentDate from './components/user/SelectAppointmentDate';
 
 const history = createBrowserHistory();
 
@@ -31,7 +30,7 @@ const routing = (
                 <AdminRoute path="/admin" component={AdminHome} />
                 <ClientRoute path="/home" component={UserHome} />
                 <ClientRoute path="/customer/appointment/add" component={AddAppointment} />
-                <ClientRoute path="/customer/appointment/select-date" stateRequired component={SelectAppointmentDate} />
+                <ClientRoute path="/customer/appointment/:id" component={AddAppointment} />
                 <Route path="/" component={Login} />
             </Switch>
         </Router>
