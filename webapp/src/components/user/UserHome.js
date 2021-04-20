@@ -8,10 +8,8 @@ import {Button, Box} from '@material-ui/core';
 
 function UserHome(props) {
     const [appointments, setAppointments] = useState([]);
-    const [isLoaded, setIsLoaded] = useState(false);
 
-
-    useEffect(() => {
+    const getAppointments = () => {
         const config = {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -24,13 +22,12 @@ function UserHome(props) {
             .then(res => {
                 setAppointments(res.data);
                 console.log(res.data);
-                /*apptDict.current = res.data.reduce((a,x) => ({...a, [x.date]: {
-                    id: x.appointmentId,
-                    status: x.status
-                }}), {});*/
             })
-            .catch(() => setAppointments(null))
-            .finally(() => setIsLoaded(true));
+            .catch(() => setAppointments(null));
+    }
+
+    useEffect(() => {
+        getAppointments()
     }, [props]);
 
     const renderAppointments = () => {
@@ -46,12 +43,8 @@ function UserHome(props) {
     }
 
     const onDeleteAppointmentCallBack = (deletedAppointmentId) => {
-        for(var i = 0; i < appointments.length; i++){ 
-            if (appointments[i].appointmendId == deletedAppointmentId)
-                appointments.splice(i, 1);
-        }
+        getAppointments();
     }
-
 
     return (
         <React.Fragment>

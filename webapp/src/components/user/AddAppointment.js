@@ -36,6 +36,7 @@ const useStyles = makeStyles({
 
 function AddAppointment(props) {
     const param = useParams();
+    const history = useHistory();
 
     const [showConfirmation, setShowConfirmation] = useState(false);
     const [newAppointmentId, setNewAppointmentId] = useState(false);
@@ -71,8 +72,10 @@ function AddAppointment(props) {
                     setAppointmentDate(date);
                     setMessage(res.data.message);
                 })
-                .catch(() => {
-                    console.log("ERROR")
+                .catch((error) => {
+                    if (error.response) {
+                        alert(error.response.data);
+                    }
                 });
         }
     }, [param.id])
@@ -105,10 +108,13 @@ function AddAppointment(props) {
 
             server.post(api.bookAppointment, params, config)
                 .then(res => {
-                    console.log("Success");
+                    alert("You appointment has been successfully booked.")
+                    history.push('/home');
                 })
-                .catch(() => {
-                    console.log("Error")
+                .catch((error) => {
+                    if (error.response) {
+                        alert(error.response.data);
+                    }
                 })
         };
 
@@ -134,84 +140,21 @@ function AddAppointment(props) {
 
             server.put(api.updateAppointment, params, config)
                 .then(res => {
-                    console.log("Success");
+                    alert("You appointment has been successfully updated.")
+                    history.push('/home');
                 })
-                .catch(() => {
-                    console.log("Error")
+                .catch((error) => {
+                    if (error.response) {
+                        alert(error.response.data);
+                    }
                 })
         };
-
 
         updateAppointment();
     }
 
     const onSelectResourceCallBack = (newSelectedResource) => {
         setSelectedResource(newSelectedResource);
-    }
-
-    const renderAddAppointment = () => {
-        return <div>
-                    <h3>Add Appointment</h3>
-                        
-                    <Box mb={2}>
-                        <h6>Person/facility for your appointment: </h6>
-                        <ResourceList user={props.user} onSelectResourceCallBack={onSelectResourceCallBack} selectedResource={selectedResource} />
-                    </Box>
-                    
-                    <Box mb={2}>
-                        <h6>An appointment date: </h6>
-                        <div id="appointmentList">
-                            <AppointmentList user={props.user} resourceId={selectedResource} onSelectAppointmentCallBack={onSelectAppointmentCallBack} selectedDate={appointmentDate} selectedDate={appointmentDate} minDate={minDate.current} maxDate={maxDate.current} />
-                        </div>
-                    </Box>
-
-                    <Box mb={2}>
-                        <h6>Message for us (optional):</h6>
-                        <div id="message">
-                            <TextField variant="outlined" size="medium" multiline={true}  type="message" label="Message" value={message} error={message !== ''} helperText={error}
-                                onChange={(e) => setMessage(e.currentTarget.value)} />
-                        </div>
-                    </Box>
-                    
-                    <Box mb={2}>
-                        <div style={{display: showConfirmation ? "block" : "none"}}>
-                            <Button variant="contained" color="primary" onClick={onConfirmAppointment} >Book appointment</Button>
-                        </div>
-                    </Box>
-                </div>
-    }
-
-    const renderUpdateAppointment = () => {
-        console.log("Resource id", appointment.resourceId)
-        return <div>
-                    <h3>Update Appointment</h3>
-                        
-                    <Box mb={2}>
-                        <h6>Person/facility for your appointment: </h6>
-                        <ResourceList user={props.user} onSelectResourceCallBack={onSelectResourceCallBack} selectedResource={selectedResource}/>
-                    </Box>
-                    
-                    <Box mb={2}>
-                        <h6>An appointment date: </h6>
-                        <div id="appointmentList"></div>
-                    </Box>
-
-                    <AppointmentList user={props.user} resourceId={selectedResource} onSelectAppointmentCallBack={onSelectAppointmentCallBack} selectedDate={appointmentDate} minDate={minDate.current} maxDate={maxDate.current}/>
-
-                    <Box mb={2}>
-                        <h6>Message for us (optional):</h6>
-                        <div id="message">
-                            <TextField variant="outlined" size="medium" multiline={true}  type="message" label="Message" value={appointment.message} error={appointment.message !== ''} helperText={error}
-                                onChange={(e) => setMessage(e.currentTarget.value)} />
-                        </div>
-                    </Box>
-                    
-                    <Box mb={2}>
-                        <div style={{display: showConfirmation ? "block" : "none"}}>
-                            <Button variant="contained" color="primary" onClick={onConfirmAppointment} >Book appointment</Button>
-                        </div>
-                    </Box>
-                </div>
     }
 
     const renderAppointmentForm = () => {

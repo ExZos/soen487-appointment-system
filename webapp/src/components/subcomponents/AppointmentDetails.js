@@ -53,13 +53,15 @@ function AppointmentDetails(props) {
 
         server.delete(api.deleteAppointment + "/" + appointment.appointmentId, config)
             .then(res => {
-                console.log("SUCCESS");
+                alert("You appointment has been successfully deleted.")
 
                 if (props.onDeleteAppointmentCallBack)
                     props.onDeleteAppointmentCallBack(appointment.appointmentId);
             })
-            .catch(() => {
-                console.log("ERROR");
+            .catch((error) => {
+                if (error.response) {
+                    alert(error.response.data);
+                  }
             });
     }
 
