@@ -72,6 +72,7 @@ As indicated in the `pom.xml` or the `package.json` files of each module, here i
 | com.google.http-client          | google-http-client-jackson2    | 1.36.0           | 
 | com.google.oauth-client         | google-oauth-client            | 1.31.0           |
 | com.googlecode.json-simple      | json-simple                    | 1.1.1            |
+| javax.xml.bind                  | jaxb-api                       | 2.3.0            |
 | mysql                           | mysql-connector-java           | 8.0.21           |
 | org.apache.maven.plugins        | maven-compiler-plugin          | 2.5.1            |
 | org.codehaus.mojo               | exec-maven-plugin              | 1.2.1            |
