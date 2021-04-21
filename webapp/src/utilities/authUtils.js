@@ -19,21 +19,17 @@ export const logoutCall = {
 }
 
 function adminCall(uri, username, token) {
-    const params = new URLSearchParams();
-    params.append('username', username);
-
     const config = buildReqConfig(token);
+    config.headers['username'] = username;
 
-    return server.post(uri, params, config);
+    return server.post(uri, null, config);
 }
 
 function clientCall(uri, email, token) {
-    const params = new URLSearchParams();
-    params.append('email', email);
-
     const config = buildReqConfig(token);
+    config.headers['email'] = email;
 
-    return server.post(uri, params, config);
+    return server.post(uri, null, config);
 }
 
 function buildReqConfig(token) {
