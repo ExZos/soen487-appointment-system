@@ -98,3 +98,166 @@ As indicated in the `pom.xml` or the `package.json` files of each module, here i
 | react-router-dom            | 5.2.0   |
 | react-scripts               | 4.0.3   |
 | web-vitals                  | 1.1.1   |
+
+
+## 6. Service API Documentation
+
+### 6.1 Admin Service API
+
+#### Description
+The Admin API handles functionalities related to the authentication of administrative users. Admins can view all appointments from of any resources (person or facility). Admins user are users native to our appointment systems and are stored in the application database.
+
+#### Operations
+
+**1. Log in:** Log in a adminsitrative user
+```
+POST  http://localhost:8081/admin/login
+Accepted content type: application/x-www-form-urlencoded
+Return type: application/json
+``` 
+- Parameters
+```
+username: the username of the admin user
+password: the password of the admin user
+```
+- Returned value
+```
+User object with authentication token
+```
+
+**2. Log out:** Log out a adminsitrative user (*)
+```
+POST  http://localhost:8081/admin/logout
+Accepted content type: application/x-www-form-urlencoded
+Return type: None
+``` 
+- Parameters
+```
+None
+```
+- Returned value
+```
+None
+```
+
+**3. Authenticate:** ? (*)
+```
+POST  http://localhost:8081/admin/auth
+Accepted content type: application/x-www-form-urlencoded
+Return type: application/json
+``` 
+- Parameters
+```
+None
+```
+- Returned value
+```
+None
+```
+
+**(*)**: Operations requires the use of authentication headers. See 6.5.
+
+### 6.2 User Service API
+
+#### Description:
+The User API handles functionalities related to the authentication of customers who wants to book appointment using our application. The registration and authentication process are handled by Google. 
+
+#### Operations:
+
+**1. Log in:** Log in a customer user using Google SSO.
+```
+GET  http://localhost:8081/user/login
+Accepted content type: None
+Return type: None
+``` 
+- Parameters
+```
+None
+```
+- Returned value
+```
+None
+```
+
+**2. Get token:** Acquires access token from Google Services.
+```
+GET  http://localhost:8081/user/token
+Accepted content type: None
+Return type: application/json
+``` 
+- Parameters
+```
+?
+```
+- Returned value
+```
+User object with authentication token from Google Services.
+```
+
+**3. Log out:** Log out a adminsitrative user (*)
+```
+POST  http://localhost:8081/user/logout
+Accepted content type: application/x-www-form-urlencoded
+Return type: None
+``` 
+- Parameters
+```
+None
+```
+- Returned value
+```
+None
+```
+
+**4. Authenticate:** ? (*)
+```
+POST  http://localhost:8081/user/auth
+Accepted content type: application/x-www-form-urlencoded
+Return type: application/json
+``` 
+- Parameters
+```
+?
+```
+- Returned value
+```
+?
+```
+
+**(*)**: Operations requires the use of authentication headers. See 6.5.
+
+### 6.3 Resource Service API
+
+#### Description:
+The Resource Service handle operations related to resources (in our case, resources mean a person or facility/equipment you would like to book). 
+
+#### Operations:
+**1. Get resources:** ? (*)
+```
+GET  http://localhost:8081/resource
+Accepted content type: None
+Return type: application/json
+``` 
+- Parameters
+```
+None
+```
+- Returned value
+```
+List of resources created by the admin user           
+```
+
+**2. Create resource:** Create a new resource. This operation is available to admin users only. (*)
+```
+POST  http://localhost:8081/resource
+Accepted content type: application/x-www-form-urlencoded
+Return type: application/json
+``` 
+- Parameters
+```
+name: Name of the resource
+```
+- Returned value
+```
+The created resource
+```
