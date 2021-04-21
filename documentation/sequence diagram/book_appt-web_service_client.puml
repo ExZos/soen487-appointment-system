@@ -1,0 +1,142 @@
+@startuml
+
+participant "Web Service Client" order 1
+participant AppointmentRest order 2
+participant IUserManager order 3
+participant IAppointmentManager order 4
+participant IResourceManager order 5
+participant ICalendarAPIManager order 6
+participant UserDAO order 7
+participant AppointmentDAO order 8
+participant ResourceDAO order 9
+participant "Google Calendar Service" order 10
+
+Activate "Web Service Client"
+"Web Service Client" -> "Web Service Client": Set Content-Type\nheader to\napplication/x-www-form-urlencoded
+
+"Web Service Client" -> "Web Service Client": Set x-api-key header
+"Web Service Client" -> "Web Service Client": Set email header
+"Web Service Client" -> "Web Service Client": Set appointmentId\nform param
+
+alt
+    "Web Service Client" -> "Web Service Client": Set optional message\nform param
+end
+
+"Web Service Client" -> AppointmentRest: POST request
+Activate AppointmentRest
+
+AppointmentRest -> IUserManager: validateToken(email, token)
+Activate IUserManager
+
+IUserManager -> UserDAO: getUserByEmail(email)
+Activate UserDAO
+
+IUserManager <-- UserDAO: User
+Deactivate UserDAO
+
+IUserManager -> IUserManager: Validate token
+
+alt token is valid
+    AppointmentRest <-- IUserManager: True
+    AppointmentRest -> IAppointmentManager: getAppointment(appointmentId)
+    Activate IAppointmentManager
+
+    IAppointmentManager -> AppointmentDAO: getAppointment(appointmentId)
+    Activate AppointmentDAO
+
+    IAppointmentManager <-- AppointmentDAO: Appointment
+    Deactivate AppointmentDAO
+
+    AppointmentRest <-- IAppointmentManager: Appointment
+    Deactivate IAppointmentManager
+
+    AppointmentRest -> AppointmentRest: Check\nAppointment\nis open
+
+    alt appointment is open
+        AppointmentRest -> IResourceManager: getResourceById(resourceId)
+        Activate IResourceManager
+
+        IResourceManager -> ResourceDAO: getResourceById(resourceId)
+        Activate ResourceDAO
+
+        IResourceManager <-- ResourceDAO: Resource
+        Deactivate ResourceDAO
+
+        AppointmentRest <-- IResourceManager: Resource
+        Deactivate IResourceManager
+
+        AppointmentRest -> IUserManager: getUserByEmail(email)
+        Activate IUserManager
+
+        IUserManager -> UserDAO: selectUserByEmail(email)
+        Activate UserDAO
+
+        IUserManager <-- UserDAO: User
+        Deactivate UserDAO
+
+        AppointmentRest <-- IUserManager: User
+        Deactivate IUserManager
+
+        AppointmentRest -> ICalendarAPIManager: createEventOnDate(token, resourceName, date)
+        Activate ICalendarAPIManager
+
+        ICalendarAPIManager -> ICalendarAPIManager: Build\nCalendar service
+        ICalendarAPIManager -> ICalendarAPIManager: Build Event
+        ICalendarAPIManager -> ICalendarAPIManager: Build Calendar\nservice request
+        ICalendarAPIManager -> "Google Calendar Service": Insert event
+        Activate "Google Calendar Service"
+
+        ICalendarAPIManager <-- "Google Calendar Service": Event
+        Deactivate "Google Calendar Service"
+
+        alt event was created
+            AppointmentRest <-- ICalendarAPIManager: True
+            AppointmentRest -> IAppointmentManager: book(appointmentId, userId, message)
+            Activate IAppointmentManager
+
+            IAppointmentManager -> AppointmentDAO: updateAppointment(appointmentId, userId, message, status)
+            Activate AppointmentDAO
+
+            IAppointmentManager <-- AppointmentDAO: Updated appointment id
+            Deactivate AppointmentDAO
+
+            IAppointmentManager -> AppointmentDAO: getAppointment(appointmentId)
+            Activate AppointmentDAO
+
+            IAppointmentManager <-- AppointmentDAO: Appointment
+            Deactivate AppointmentDAO
+
+            alt appointment was booked
+                AppointmentRest <-- IAppointmentManager: Booked appointment
+
+                "Web Service Client" <-- AppointmentRest: 200 HttpResponse
+
+            else appointment was not booked
+                AppointmentRest <-- IAppointmentManager: null
+                Deactivate IAppointmentManager
+
+                "Web Service Client" <-- AppointmentRest: 500 HttpResponse
+            end
+
+        else event was not created
+            AppointmentRest <-- ICalendarAPIManager: False
+            Deactivate ICalendarAPIManager
+
+            "Web Service Client" <-- AppointmentRest: 500 HttpResponse
+         end
+
+    else appointment is closed
+        "Web Service Client" <-- AppointmentRest: 401 HttpResponse
+    end
+
+else token is not valid
+    AppointmentRest <-- IUserManager: False
+    Deactivate IUserManager
+
+    "Web Service Client" <-- AppointmentRest: 401 HttpResponse
+    Deactivate AppointmentRest
+end
+
+Deactivate "Web Service Client"
+
+@enduml
