@@ -18,6 +18,7 @@ public class UserRest {
     private IUserManager userManager = (IUserManager) ManagerFactory.UserManager.getManager();
 
     @GET
+    @Produces(MediaType.TEXT_PLAIN)
     @Path("login")
     public Response login(@QueryParam("isWebOrigin") boolean isWebOrigin) {
         try {
@@ -61,10 +62,9 @@ public class UserRest {
 
     // Not sure if needed or if UserManager.authenticate is enough
     @POST
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("auth")
-    public Response authenticate(@FormParam("email") String email, @HeaderParam("x-api-key") String token) {
+    public Response authenticate(@HeaderParam("email") String email, @HeaderParam("x-api-key") String token) {
         try {
             boolean isAuthenticated = userManager.validateToken(email, token);
 
@@ -84,9 +84,8 @@ public class UserRest {
     }
 
     @POST
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("logout")
-    public Response logout(@FormParam("email") String email, @HeaderParam("x-api-key") String token) {
+    public Response logout(@HeaderParam("email") String email, @HeaderParam("x-api-key") String token) {
         try {
             boolean validated = userManager.validateToken(email, token);
             if(!validated)
