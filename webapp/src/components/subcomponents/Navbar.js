@@ -21,7 +21,7 @@ const clientLinks = [
     },
     {
         'label': 'Add Appointment',
-        'path': 'customer/appointment/'
+        'path': 'customer/appointment/add'
     }
 ]
 
