@@ -2,6 +2,7 @@ package com.example.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.scribejava.core.model.OAuth2AccessToken;
+import com.sun.media.jfxmedia.control.MediaPlayerOverlay;
 import factories.ManagerFactory;
 import org.json.simple.JSONObject;
 import repository.interfaces.ISSOManager;
@@ -18,6 +19,7 @@ public class UserRest {
     private IUserManager userManager = (IUserManager) ManagerFactory.UserManager.getManager();
 
     @GET
+    @Produces(MediaType.TEXT_PLAIN)
     @Path("login")
     public Response login(@QueryParam("isWebOrigin") boolean isWebOrigin) {
         try {
