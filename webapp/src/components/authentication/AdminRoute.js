@@ -15,7 +15,7 @@ function AdminRoute({component: Component, stateRequired, ...rest}) {
 
     useEffect(() => {
         authCall.admin(user?.username, user?.token)
-            .then(res => setIsAuth(res.data))
+            .then(res => setIsAuth(res.data.isAuthenticated))
             .catch(() => setIsAuth(false))
             .finally(() => setIsLoaded(true));
     }, [user, isLoaded]);
