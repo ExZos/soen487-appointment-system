@@ -140,7 +140,7 @@ None
 None
 ```
 
-**3. Authenticate:** ? (*)
+**3. Authenticate:** Check if the supplied credentials are valid admin credentials. (*)
 ```
 POST  http://localhost:8081/admin/auth
 Accepted content type: application/x-www-form-urlencoded
@@ -152,7 +152,7 @@ None
 ```
 - Returned value
 ```
-None
+isAuthenticated: Boolean indicating whether the credentials are valid or not.
 ```
 
 **(*)**: Operations requires the use of authentication headers. See 6.5.
@@ -187,7 +187,7 @@ Return type: application/json
 ``` 
 - Parameters
 ```
-?
+code: Code generated after successful login with Google SSO.
 ```
 - Returned value
 ```
@@ -209,7 +209,7 @@ None
 None
 ```
 
-**4. Authenticate:** ? (*)
+**4. Authenticate:** Check if the supplied credentials are valid user credentials. (*)
 ```
 POST  http://localhost:8081/user/auth
 Accepted content type: application/x-www-form-urlencoded
@@ -217,11 +217,11 @@ Return type: application/json
 ``` 
 - Parameters
 ```
-?
+None
 ```
 - Returned value
 ```
-?
+isAuthenticated: Boolean indicating whether the credentials are valid or not.
 ```
 
 **(*)**: Operations requires the use of authentication headers. See 6.5.
