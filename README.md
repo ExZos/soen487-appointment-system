@@ -401,7 +401,7 @@ None
 **(*)**: Operations requires the use of authentication headers. See 6.5.
 
 ### 6.5 Authentication headers
-Certain web service calls required the user to be authenticated. 
+Certain web service calls require the user to be authenticated. 
 
 For admin user web service calls, add the following headers if required:
 ```
@@ -412,5 +412,5 @@ username: the name of the user
 For regular user web services calls, add the following headers if required:
 ```
 x-api-key: the Google Access token
-email: the email of the 
+email: the email of the user 
 ```
