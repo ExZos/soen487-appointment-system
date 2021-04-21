@@ -350,7 +350,7 @@ resourceId: Id of the resource
 A list of all open appointments of the resource with matching resource id.      
 ```
 
-**6. Book appoint:** Book an appointment. (*)
+**6. Book appointment:** Book an appointment. (*)
 ```
 POST  http://localhost:8081/appointment/book
 Accepted content type: application/x-www-form-urlencoded
