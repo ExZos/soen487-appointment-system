@@ -5,7 +5,7 @@ A general appointment system that uses the Google Calendar API.
 1. [Requirements](#1-requirements)  
 2. [Installation](#2-installation)  
    2.1 [Maven](#21-maven)  
-   2.2. [npm](#22-npm)  
+   2.2 [npm](#22-npm)  
 3. [Configuration](#3-configuration)  
    3.1 [Database Configuration](#31-database-configuration)  
    3.2 [Google API Credentials Configuration](#32-google-api-credentials-configuration)  
@@ -13,6 +13,13 @@ A general appointment system that uses the Google Calendar API.
 5. [External Libraries](#5-external-libraries)  
    5.1 [Backend Libraries](#51-backend-libraries)  
    5.2 [Frontend Libraries](#52-frontend-libraries)
+6. [Service API Documentation](#6-service-api-documentation)  
+   6.1 [Admin Service API](#61-admin-service-api)  
+   6.2 [User Service API](#62-user-service-api)  
+   6.3 [Resource Service API](#63-resource-service-api)  
+   6.4 [Appointment Service API](#64-appointment-service-api)  
+   6.5 [Authentication Headers](#65-authentication-headers)
+
 
 ## 1. Requirements
 - Java 1.8
@@ -232,7 +239,7 @@ isAuthenticated: Boolean indicating whether the credentials are valid or not.
 The Resource Service handle operations related to resources (in our case, resources mean a person or facility/equipment you would like to book). 
 
 #### Operations:
-**1. Get resources:** ? (*)
+**1. Get resources:** Get all resources. (*)
 ```
 GET  http://localhost:8081/resource
 Accepted content type: None
@@ -393,4 +400,17 @@ None
 
 **(*)**: Operations requires the use of authentication headers. See 6.5.
 
-### 6.5 Appointment Service API
+### 6.5 Authentication headers
+Certain web service calls required the user to be authenticated. 
+
+For admin user web service calls, add the following headers if required:
+```
+x-api-key: the user authentication token 
+username: the name of the user
+```
+
+For regular user web services calls, add the following headers if required:
+```
+x-api-key: the Google Access token
+email: the email of the 
+```
