@@ -24,5 +24,10 @@ export const api = {
 
     // Appointment
     listResourceAppointments: '/appointment/resourceAppointments',
-    getAppointmentDetails : '/appointment'
+    listOpenAppointments: '/appointment/resourceAppointments/open',
+    getAppointmentDetails : '/appointment',
+    getUserAppointments: '/appointment/user',
+    bookAppointment: '/appointment/book',
+    deleteAppointment: '/appointment',
+    updateAppointment: '/appointment'
 };

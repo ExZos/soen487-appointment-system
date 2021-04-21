@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {useHistory, useLocation} from 'react-router';
-import {Button, CircularProgress, makeStyles} from '@material-ui/core';
+import {CircularProgress, makeStyles} from '@material-ui/core';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 
@@ -8,6 +8,8 @@ import {api, server} from '../../endpoints/server';
 import {dateFormatter} from '../../utilities/dateUtils';
 import Navbar from '../subcomponents/Navbar';
 import BackNav from '../subcomponents/BackNav';
+import ResourceList from '../subcomponents/ResourceList'
+import AppointmentList from '../subcomponents/AppointmentList';
 
 const useStyles = makeStyles({
     apptCalendar: {
@@ -28,8 +30,10 @@ const useStyles = makeStyles({
     }
 });
 
-function AdminAppointmentList(props) {
-    const classes = useStyles();
+function AddAppointment(props) {
+    const appointmentList = useRef(null);
+
+    /*const classes = useStyles();
 
     const location = useLocation();
     const history = useHistory();
@@ -119,24 +123,20 @@ function AdminAppointmentList(props) {
                 onClickDay={(date) => redirectAppointmentDetails(date)}
             />
         );
-    };
+    };*/
+
+    const displayAppointments = () => {
+        
+    }
 
     return (
         <React.Fragment>
-            <Navbar user={props.user} admin />
+            <Navbar user={props.user} customer />
 
             <BackNav />
-
-            <div id="adminAppointmentList" className="text-center">
-                <h3>Appointments</h3>
-                <div>for <i>{resource.current.name}</i></div>
-
-                <div className="appointmentList mt-3">
-                    {renderAppointmentList()}
-                </div>
-            </div>
+            <ResourceList user={props.user} redirectUrl="/customer/appointment/add/select-date" callback={displayAppointments}/>
         </React.Fragment>
     );
 }
 
-export default AdminAppointmentList;
+export default AddAppointment;
