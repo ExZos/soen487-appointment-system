@@ -3,6 +3,7 @@ package com.example.rest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.scribejava.core.model.OAuth2AccessToken;
 import factories.ManagerFactory;
+import org.json.simple.JSONObject;
 import repository.interfaces.ISSOManager;
 import repository.interfaces.IUserManager;
 import repository.pojos.User;
@@ -61,11 +62,18 @@ public class UserRest {
     // Not sure if needed or if UserManager.authenticate is enough
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_JSON)
     @Path("auth")
     public Response authenticate(@FormParam("email") String email, @HeaderParam("x-api-key") String token) {
         try {
+            boolean isAuthenticated = userManager.validateToken(email, token);
+
+            JSONObject jo = new JSONObject();
+            jo.put("isAuthenticated", isAuthenticated);
+            ObjectMapper mapper = new ObjectMapper();
+
             return Response.status(Response.Status.OK)
-                    .entity(userManager.validateToken(email, token))
+                    .entity(mapper.writeValueAsBytes(jo))
                     .build();
         } catch(Exception e) {
             e.printStackTrace();
