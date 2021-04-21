@@ -261,3 +261,136 @@ name: Name of the resource
 ```
 The created resource
 ```
+
+### 6.4 Appointment Service API
+
+#### Description:
+The Resource Service handle operations related to resources (in our case, resources mean a person or facility/equipment you would like to book). 
+
+#### Operations:
+**1. Get appointment:** Get an appointment by its appointment id (*)
+```
+GET  http://localhost:8081/appointment/{appointmentId}
+Accepted content type: None
+Return type: application/json
+``` 
+- Parameters
+```
+appointmentId: Id of the appointment
+```
+- Returned value
+```
+The appointment with the matching appointment id.          
+```
+
+**2. Get all resource appointments:** Get all appointments associated with a resource. Only available to admin users. (*)
+```
+GET  http://localhost:8081/appointment/resourceAppointments/{resourceId}
+Accepted content type: None
+Return type: application/json
+``` 
+- Parameters
+```
+resourceId: Id of the resource
+```
+- Returned value
+```
+A list of all appointments of the resource with matching resource id.      
+```
+
+**3. Get all open appointments:** Get all open appointments from all resources. Only available to regular users. (*)
+```
+GET  http://localhost:8081/appointment/openAppointments
+Accepted content type: None
+Return type: application/json
+``` 
+- Parameters
+```
+None
+```
+- Returned value
+```
+A list of all open appointments.     
+```
+
+**4. Get open appointments of a resource:** Get all available appoinemtns of a resource. Only available to regular users. (*)
+```
+GET  http://localhost:8081/appointment/resourceAppointments/open/{resourceId}
+Accepted content type: None
+Return type: application/json
+``` 
+- Parameters
+```
+resourceId: Id of the resource
+```
+- Returned value
+```
+A list of all open appointments of the resource with matching resource id.      
+```
+
+**5. Get open appointments of a resource:** Get all available appoinemtns of a resource. Only available to regular users. (*)
+```
+GET  http://localhost:8081/appointment/resourceAppointments/open/{resourceId}
+Accepted content type: None
+Return type: application/json
+``` 
+- Parameters
+```
+resourceId: Id of the resource
+```
+- Returned value
+```
+A list of all open appointments of the resource with matching resource id.      
+```
+
+**6. Book appoint:** Book an appointment. (*)
+```
+POST  http://localhost:8081/appointment/book
+Accepted content type: application/x-www-form-urlencoded
+Return type: application/json
+``` 
+- Parameters
+```
+appointmentId: The id of the appointment the user would like to book.
+message: The message of the customer.
+```
+- Returned value
+```
+The booked appointment.
+```
+
+**7. Update appointment:** Book an appointment. (*)
+```
+PUT  http://localhost:8081/appointment
+Accepted content type: application/x-www-form-urlencoded
+Return type: application/json
+``` 
+- Parameters
+```
+appointmentId: The id of the old appointment that the customer previously booked.
+newAppointmentId: The id of the new appointment.
+message: The new updated message for the appointment.
+```
+- Returned value
+```
+The booked appointment.
+```
+
+**8. Delete appointment:** Delete an appointment. (*)
+```
+DELETE  http://localhost:8081/appointment/{appointmentId}
+Accepted content type: application/x-www-form-urlencoded
+Return type: None
+``` 
+- Parameters
+```
+appointmentId: The id of the appointment to delete
+```
+- Returned value
+```
+None
+```
+
+**(*)**: Operations requires the use of authentication headers. See 6.5.
+
+### 6.5 Appointment Service API
