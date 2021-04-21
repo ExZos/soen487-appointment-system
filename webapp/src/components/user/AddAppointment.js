@@ -114,7 +114,8 @@ function AddAppointment(props) {
                 })
                 .catch((error) => {
                     if (error.response) {
-                        alert(error.response.data);
+                        let errorMessage = "Error " + error.response.status + ", "+  error.response.data
+                        alert(errorMessage);
                     }
                 })
         };
