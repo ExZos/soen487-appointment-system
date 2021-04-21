@@ -120,7 +120,7 @@ public class AppointmentRest {
             if (appointment.getUserId() == user.getUserId() && userManager.validateToken(email, token)) {
                 Appointment newAppointment = appointmentManager.getAppointment(newAppointmentId);
 
-                if(newAppointment.getStatus().toString().equals("OPEN"))
+                if(newAppointment.getStatus().toString().equals("OPEN") || appointmentId == newAppointmentId)
                 {
                     appointmentManager.cancelAppointment(appointmentId);
                     newAppointment = appointmentManager.bookAppointment(newAppointmentId, user.getUserId(), message);
