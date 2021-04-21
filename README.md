@@ -5,7 +5,7 @@ A general appointment system that uses the Google Calendar API.
 1. [Requirements](#1-requirements)  
 2. [Installation](#2-installation)  
    2.1 [Maven](#21-maven)  
-   2.2. [npm](#22-npm)  
+   2.2 [npm](#22-npm)  
 3. [Configuration](#3-configuration)  
    3.1 [Database Configuration](#31-database-configuration)  
    3.2 [Google API Credentials Configuration](#32-google-api-credentials-configuration)  
@@ -13,6 +13,13 @@ A general appointment system that uses the Google Calendar API.
 5. [External Libraries](#5-external-libraries)  
    5.1 [Backend Libraries](#51-backend-libraries)  
    5.2 [Frontend Libraries](#52-frontend-libraries)
+6. [Service API Documentation](#6-service-api-documentation)  
+   6.1 [Admin Service API](#61-admin-service-api)  
+   6.2 [User Service API](#62-user-service-api)  
+   6.3 [Resource Service API](#63-resource-service-api)  
+   6.4 [Appointment Service API](#64-appointment-service-api)  
+   6.5 [Authentication Headers](#65-authentication-headers)
+
 
 ## 1. Requirements
 - Java 1.8
@@ -98,3 +105,312 @@ As indicated in the `pom.xml` or the `package.json` files of each module, here i
 | react-router-dom            | 5.2.0   |
 | react-scripts               | 4.0.3   |
 | web-vitals                  | 1.1.1   |
+
+
+## 6. Service API Documentation
+
+### 6.1 Admin Service API
+
+#### Description
+The Admin API handles functionalities related to the authentication of administrative users. Admins can view all appointments from of any resources (person or facility). Admins user are users native to our appointment systems and are stored in the application database.
+
+#### Operations
+
+**1. Log in:** Log in a adminsitrative user
+```
+POST  http://localhost:8081/admin/login
+Accepted content type: application/x-www-form-urlencoded
+Return type: application/json
+``` 
+- Parameters
+```
+username: the username of the admin user
+password: the password of the admin user
+```
+- Returned value
+```
+User object with authentication token
+```
+
+**2. Log out:** Log out a adminsitrative user (*)
+```
+POST  http://localhost:8081/admin/logout
+Accepted content type: application/x-www-form-urlencoded
+Return type: None
+``` 
+- Parameters
+```
+None
+```
+- Returned value
+```
+None
+```
+
+**3. Authenticate:** Check if the supplied credentials are valid admin credentials. (*)
+```
+POST  http://localhost:8081/admin/auth
+Accepted content type: application/x-www-form-urlencoded
+Return type: application/json
+``` 
+- Parameters
+```
+None
+```
+- Returned value
+```
+isAuthenticated: Boolean indicating whether the credentials are valid or not.
+```
+
+**(*)**: Operations requires the use of authentication headers. See 6.5.
+
+### 6.2 User Service API
+
+#### Description:
+The User API handles functionalities related to the authentication of customers who wants to book appointment using our application. The registration and authentication process are handled by Google. 
+
+#### Operations:
+
+**1. Log in:** Log in a customer user using Google SSO.
+```
+GET  http://localhost:8081/user/login
+Accepted content type: None
+Return type: None
+``` 
+- Parameters
+```
+None
+```
+- Returned value
+```
+None
+```
+
+**2. Get token:** Acquires access token from Google Services.
+```
+GET  http://localhost:8081/user/token
+Accepted content type: None
+Return type: application/json
+``` 
+- Parameters
+```
+code: Code generated after successful login with Google SSO.
+```
+- Returned value
+```
+User object with authentication token from Google Services.
+```
+
+**3. Log out:** Log out a adminsitrative user (*)
+```
+POST  http://localhost:8081/user/logout
+Accepted content type: application/x-www-form-urlencoded
+Return type: None
+``` 
+- Parameters
+```
+None
+```
+- Returned value
+```
+None
+```
+
+**4. Authenticate:** Check if the supplied credentials are valid user credentials. (*)
+```
+POST  http://localhost:8081/user/auth
+Accepted content type: application/x-www-form-urlencoded
+Return type: application/json
+``` 
+- Parameters
+```
+None
+```
+- Returned value
+```
+isAuthenticated: Boolean indicating whether the credentials are valid or not.
+```
+
+**(*)**: Operations requires the use of authentication headers. See 6.5.
+
+### 6.3 Resource Service API
+
+#### Description:
+The Resource Service handle operations related to resources (in our case, resources mean a person or facility/equipment you would like to book). 
+
+#### Operations:
+**1. Get resources:** Get all resources. (*)
+```
+GET  http://localhost:8081/resource
+Accepted content type: None
+Return type: application/json
+``` 
+- Parameters
+```
+None
+```
+- Returned value
+```
+List of resources created by the admin user           
+```
+
+**2. Create resource:** Create a new resource. This operation is available to admin users only. (*)
+```
+POST  http://localhost:8081/resource
+Accepted content type: application/x-www-form-urlencoded
+Return type: application/json
+``` 
+- Parameters
+```
+name: Name of the resource
+```
+- Returned value
+```
+The created resource
+```
+
+### 6.4 Appointment Service API
+
+#### Description:
+The Resource Service handle operations related to resources (in our case, resources mean a person or facility/equipment you would like to book). 
+
+#### Operations:
+**1. Get appointment:** Get an appointment by its appointment id (*)
+```
+GET  http://localhost:8081/appointment/{appointmentId}
+Accepted content type: None
+Return type: application/json
+``` 
+- Parameters
+```
+appointmentId: Id of the appointment
+```
+- Returned value
+```
+The appointment with the matching appointment id.          
+```
+
+**2. Get all resource appointments:** Get all appointments associated with a resource. Only available to admin users. (*)
+```
+GET  http://localhost:8081/appointment/resourceAppointments/{resourceId}
+Accepted content type: None
+Return type: application/json
+``` 
+- Parameters
+```
+resourceId: Id of the resource
+```
+- Returned value
+```
+A list of all appointments of the resource with matching resource id.      
+```
+
+**3. Get all open appointments:** Get all open appointments from all resources. Only available to regular users. (*)
+```
+GET  http://localhost:8081/appointment/openAppointments
+Accepted content type: None
+Return type: application/json
+``` 
+- Parameters
+```
+None
+```
+- Returned value
+```
+A list of all open appointments.     
+```
+
+**4. Get open appointments of a resource:** Get all available appoinemtns of a resource. Only available to regular users. (*)
+```
+GET  http://localhost:8081/appointment/resourceAppointments/open/{resourceId}
+Accepted content type: None
+Return type: application/json
+``` 
+- Parameters
+```
+resourceId: Id of the resource
+```
+- Returned value
+```
+A list of all open appointments of the resource with matching resource id.      
+```
+
+**5. Get open appointments of a resource:** Get all available appoinemtns of a resource. Only available to regular users. (*)
+```
+GET  http://localhost:8081/appointment/resourceAppointments/open/{resourceId}
+Accepted content type: None
+Return type: application/json
+``` 
+- Parameters
+```
+resourceId: Id of the resource
+```
+- Returned value
+```
+A list of all open appointments of the resource with matching resource id.      
+```
+
+**6. Book appointment:** Book an appointment. (*)
+```
+POST  http://localhost:8081/appointment/book
+Accepted content type: application/x-www-form-urlencoded
+Return type: application/json
+``` 
+- Parameters
+```
+appointmentId: The id of the appointment the user would like to book.
+message: The message of the customer.
+```
+- Returned value
+```
+The booked appointment.
+```
+
+**7. Update appointment:** Book an appointment. (*)
+```
+PUT  http://localhost:8081/appointment
+Accepted content type: application/x-www-form-urlencoded
+Return type: application/json
+``` 
+- Parameters
+```
+appointmentId: The id of the old appointment that the customer previously booked.
+newAppointmentId: The id of the new appointment.
+message: The new updated message for the appointment.
+```
+- Returned value
+```
+The booked appointment.
+```
+
+**8. Delete appointment:** Delete an appointment. (*)
+```
+DELETE  http://localhost:8081/appointment/{appointmentId}
+Accepted content type: application/x-www-form-urlencoded
+Return type: None
+``` 
+- Parameters
+```
+appointmentId: The id of the appointment to delete
+```
+- Returned value
+```
+None
+```
+
+**(*)**: Operations requires the use of authentication headers. See 6.5.
+
+### 6.5 Authentication headers
+Certain web service calls require the user to be authenticated. 
+
+For admin user web service calls, add the following headers if required:
+```
+x-api-key: the user authentication token 
+username: the name of the user
+```
+
+For regular user web services calls, add the following headers if required:
+```
+x-api-key: the Google Access token
+email: the email of the user 
+```

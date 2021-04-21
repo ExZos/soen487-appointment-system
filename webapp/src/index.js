@@ -29,7 +29,7 @@ const routing = (
                 <Route path="/admin/login" component={AdminLoginForm} />
                 <AdminRoute path="/admin" component={AdminHome} />
                 <ClientRoute path="/home" component={UserHome} />
-                <ClientRoute path="/customer/appointment/add" component={AddAppointment} />
+                <ClientRoute path="/customer/appointment/" component={AddAppointment} />
                 <ClientRoute path="/customer/appointment/:id" component={AddAppointment} />
                 <Route path="/" component={Login} />
             </Switch>
