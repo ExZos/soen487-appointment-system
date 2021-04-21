@@ -71,6 +71,7 @@ function AddAppointment(props) {
                     let date = dateConverter.fromSQLDateString(res.data.date);
                     setAppointmentDate(date);
                     setMessage(res.data.message);
+                    setNewAppointmentId(res.data.appointmentId)
                 })
                 .catch((error) => {
                     if (error.response) {
@@ -130,6 +131,8 @@ function AddAppointment(props) {
                 'message': message
             }
 
+            console.log("Update params ", params);
+
             const config = {
                 headers: {
                     'Content-Type': 'application/json',
@@ -145,7 +148,8 @@ function AddAppointment(props) {
                 })
                 .catch((error) => {
                     if (error.response) {
-                        alert(error.response.data);
+                        let errorMessage = "Error " + error.response.status + ", "+  error.response.data
+                        alert(errorMessage);
                     }
                 })
         };

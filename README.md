@@ -320,7 +320,7 @@ None
 A list of all open appointments.     
 ```
 
-**4. Get open appointments of a resource:** Get all available appoinemtns of a resource. Only available to regular users. (*)
+**4. Get open appointments of a resource:** Get all available appoinments of a resource. Only available to regular users. (*)
 ```
 GET  http://localhost:8081/appointment/resourceAppointments/open/{resourceId}
 Accepted content type: None
@@ -335,19 +335,19 @@ resourceId: Id of the resource
 A list of all open appointments of the resource with matching resource id.      
 ```
 
-**5. Get open appointments of a resource:** Get all available appoinemtns of a resource. Only available to regular users. (*)
+**5. Get all appointments of a user:** Get all booked oppointments of a user. Only available to regular users. (*)
 ```
-GET  http://localhost:8081/appointment/resourceAppointments/open/{resourceId}
+GET  http://localhost:8081/appointment/user
 Accepted content type: None
 Return type: application/json
 ``` 
 - Parameters
 ```
-resourceId: Id of the resource
+None
 ```
 - Returned value
 ```
-A list of all open appointments of the resource with matching resource id.      
+A list of all appointments booked by the user of the current session.     
 ```
 
 **6. Book appointment:** Book an appointment. (*)
