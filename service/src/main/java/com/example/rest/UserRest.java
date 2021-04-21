@@ -18,7 +18,7 @@ public class UserRest {
 
     @GET
     @Path("login")
-    public Response login(@HeaderParam("User-Agent") String userAgent, @QueryParam("isWebOrigin") boolean isWebOrigin) {
+    public Response login(@QueryParam("isWebOrigin") boolean isWebOrigin) {
         try {
             String authUrl = ssoManager.getAuthorizationUrl(isWebOrigin);
 
@@ -35,7 +35,7 @@ public class UserRest {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("token")
-    public Response getToken(@HeaderParam("User-Agent") String userAgent, @QueryParam("code") String code, @QueryParam("isWebOrigin") boolean isWebOrigin) {
+    public Response getToken(@QueryParam("code") String code, @QueryParam("isWebOrigin") boolean isWebOrigin) {
         try {
             OAuth2AccessToken accessToken = ssoManager.getAccessToken(code, isWebOrigin);
             String email = ssoManager.getLoginEmail(accessToken);
