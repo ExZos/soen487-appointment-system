@@ -2,6 +2,7 @@ package com.example.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import factories.ManagerFactory;
+import org.json.simple.JSONObject;
 import repository.interfaces.IAdminManager;
 import repository.pojos.Admin;
 
@@ -43,12 +44,18 @@ public class AdminRest {
 
     // Same with UserRest's authenticate, just putting this so that using either this or Manager is available
     @POST
-    @Consumes({MediaType.APPLICATION_FORM_URLENCODED})
+    @Produces(MediaType.APPLICATION_JSON)
     @Path("auth")
-    public Response authenticate(@HeaderParam("x-api-key") String token, @FormParam("username") String username) {
+    public Response authenticate(@HeaderParam("x-api-key") String token, @HeaderParam("username") String username) {
         try {
+            boolean isAuthenticated = adminManager.validateToken(username, token);
+
+            JSONObject jo = new JSONObject();
+            jo.put("isAuthenticated", isAuthenticated);
+            ObjectMapper mapper = new ObjectMapper();
+
             return Response.status(Response.Status.OK)
-                    .entity(adminManager.validateToken(username, token))
+                    .entity(mapper.writeValueAsBytes(jo))
                     .build();
         } catch(Exception e) {
             e.printStackTrace();
@@ -58,9 +65,8 @@ public class AdminRest {
     }
 
     @POST
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("logout")
-    public Response logout(@HeaderParam("x-api-key") String token, @FormParam("username") String username) {
+    public Response logout(@HeaderParam("x-api-key") String token, @HeaderParam("username") String username) {
         try {
             boolean validated = adminManager.validateToken(username, token);
             if(!validated)

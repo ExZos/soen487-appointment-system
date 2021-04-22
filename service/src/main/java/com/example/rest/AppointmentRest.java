@@ -74,8 +74,10 @@ public class AppointmentRest {
         try {
             Appointment appointment = appointmentManager.getAppointment(appointmentId);
             User user = userManager.getUserByEmail(email);
+            Resource resource = resourceManager.getResourceById(appointment.getResourceId());
+
             if (appointment.getUserId() == user.getUserId() && userManager.validateToken(email, token)) {
-                boolean success = calendarManager.deleteEventOnDate(new OAuth2AccessToken(user.getToken()), appointment.getDate());
+                boolean success = calendarManager.deleteEventOnDate(new OAuth2AccessToken(user.getToken()), resource.getName(), appointment.getDate());
                 if (!success)
                     throw new Exception("Failed to delete event");
 
@@ -117,17 +119,19 @@ public class AppointmentRest {
 
             Appointment appointment = appointmentManager.getAppointment(appointmentId);
             User user = userManager.getUserByEmail(email);
+            Resource resource = resourceManager.getResourceById(appointment.getResourceId());
+
             if (appointment.getUserId() == user.getUserId() && userManager.validateToken(email, token)) {
                 Appointment newAppointment = appointmentManager.getAppointment(newAppointmentId);
 
-                if(newAppointment.getStatus().toString().equals("OPEN"))
+                if(newAppointment.getStatus().toString().equals("OPEN") || appointmentId == newAppointmentId)
                 {
                     appointmentManager.cancelAppointment(appointmentId);
                     newAppointment = appointmentManager.bookAppointment(newAppointmentId, user.getUserId(), message);
 
                     LocalDate from = appointment.getDate();
                     LocalDate to = newAppointment.getDate();
-                    boolean success = calendarManager.updateEventOnDate(new OAuth2AccessToken(user.getToken()), from, to);
+                    boolean success = calendarManager.updateEventOnDate(new OAuth2AccessToken(user.getToken()), resource.getName(), from, to);
                     if(!success)
                         throw new Exception("Failed to move event");
 

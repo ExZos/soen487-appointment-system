@@ -3,6 +3,7 @@ package com.example.rest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.scribejava.core.model.OAuth2AccessToken;
 import factories.ManagerFactory;
+import org.json.simple.JSONObject;
 import repository.interfaces.ISSOManager;
 import repository.interfaces.IUserManager;
 import repository.pojos.User;
@@ -17,8 +18,9 @@ public class UserRest {
     private IUserManager userManager = (IUserManager) ManagerFactory.UserManager.getManager();
 
     @GET
+    @Produces(MediaType.TEXT_PLAIN)
     @Path("login")
-    public Response login(@HeaderParam("User-Agent") String userAgent, @QueryParam("isWebOrigin") boolean isWebOrigin) {
+    public Response login(@QueryParam("isWebOrigin") boolean isWebOrigin) {
         try {
             String authUrl = ssoManager.getAuthorizationUrl(isWebOrigin);
 
@@ -35,7 +37,7 @@ public class UserRest {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("token")
-    public Response getToken(@HeaderParam("User-Agent") String userAgent, @QueryParam("code") String code, @QueryParam("isWebOrigin") boolean isWebOrigin) {
+    public Response getToken(@QueryParam("code") String code, @QueryParam("isWebOrigin") boolean isWebOrigin) {
         try {
             OAuth2AccessToken accessToken = ssoManager.getAccessToken(code, isWebOrigin);
             String email = ssoManager.getLoginEmail(accessToken);
@@ -60,12 +62,18 @@ public class UserRest {
 
     // Not sure if needed or if UserManager.authenticate is enough
     @POST
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_JSON)
     @Path("auth")
-    public Response authenticate(@FormParam("email") String email, @HeaderParam("x-api-key") String token) {
+    public Response authenticate(@HeaderParam("email") String email, @HeaderParam("x-api-key") String token) {
         try {
+            boolean isAuthenticated = userManager.validateToken(email, token);
+
+            JSONObject jo = new JSONObject();
+            jo.put("isAuthenticated", isAuthenticated);
+            ObjectMapper mapper = new ObjectMapper();
+
             return Response.status(Response.Status.OK)
-                    .entity(userManager.validateToken(email, token))
+                    .entity(mapper.writeValueAsBytes(jo))
                     .build();
         } catch(Exception e) {
             e.printStackTrace();
@@ -76,9 +84,8 @@ public class UserRest {
     }
 
     @POST
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("logout")
-    public Response logout(@FormParam("email") String email, @HeaderParam("x-api-key") String token) {
+    public Response logout(@HeaderParam("email") String email, @HeaderParam("x-api-key") String token) {
         try {
             boolean validated = userManager.validateToken(email, token);
             if(!validated)
