@@ -31,7 +31,7 @@ public class CalendarAPIManager implements ICalendarManager {
         zoneOffset = "-04:00";
     }
 
-    public Event getEventOnDate(OAuth2AccessToken accessToken, LocalDate date) throws IOException {
+    public Event getEventOnDate(OAuth2AccessToken accessToken, String resourceName, LocalDate date) throws IOException {
         Calendar service = buildCalendarService(accessToken);
 
         // Prepare DateTime values
@@ -51,11 +51,17 @@ public class CalendarAPIManager implements ICalendarManager {
         if(events.size() == 0)
             return null;
 
-        return events.get(0);
+        for (Event event: events) {
+            if(event.getSummary().equals(resourceName))
+                return event;
+        }
+
+
+        return null;
     }
 
-    public String getEventIdOnDate(OAuth2AccessToken accessToken, LocalDate date) throws IOException {
-        Event event = getEventOnDate(accessToken, date);
+    public String getEventIdOnDate(OAuth2AccessToken accessToken, String resourceName, LocalDate date) throws IOException {
+        Event event = getEventOnDate(accessToken, resourceName, date);
         if(event == null)
             return null;
 
@@ -83,8 +89,8 @@ public class CalendarAPIManager implements ICalendarManager {
         return true;
     }
 
-    public boolean deleteEventOnDate(OAuth2AccessToken accessToken, LocalDate date) throws IOException {
-        String eventId = getEventIdOnDate(accessToken, date);
+    public boolean deleteEventOnDate(OAuth2AccessToken accessToken, String resourceName, LocalDate date) throws IOException {
+        String eventId = getEventIdOnDate(accessToken, resourceName, date);
         if(eventId == null)
             return false;
 
@@ -96,8 +102,8 @@ public class CalendarAPIManager implements ICalendarManager {
         return true;
     }
 
-    public boolean updateEventOnDate(OAuth2AccessToken accessToken, LocalDate fromDate, LocalDate toDate) throws IOException {
-        Event event = getEventOnDate(accessToken, fromDate);
+    public boolean updateEventOnDate(OAuth2AccessToken accessToken, String resourceName, LocalDate fromDate, LocalDate toDate) throws IOException {
+        Event event = getEventOnDate(accessToken, resourceName, fromDate);
         if(event == null)
             return false;
 

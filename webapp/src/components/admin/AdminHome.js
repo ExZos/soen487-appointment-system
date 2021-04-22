@@ -31,6 +31,7 @@ function AdminHome(props) {
     const [isLoaded, setIsLoaded] = useState(false);
 
     useEffect(() => {
+        console.log(props.user);
         const getResourceList = () => {
             const config = {
                 headers: {

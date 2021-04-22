@@ -27,6 +27,7 @@ function UserHome(props) {
     }
 
     useEffect(() => {
+        console.log(props.user);
         getAppointments()
     }, [props]);
 
